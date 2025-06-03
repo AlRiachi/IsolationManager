@@ -628,7 +628,7 @@ export default function IsolationPointsManagement() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Isolation Position</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value || ""}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select position" />
