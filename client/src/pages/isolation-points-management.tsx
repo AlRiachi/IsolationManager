@@ -340,23 +340,23 @@ export default function IsolationPointsManagement() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Select value={selectedType} onValueChange={setSelectedType}>
+              <Select value={selectedType || "all"} onValueChange={(value) => setSelectedType(value === "all" ? "" : value)}>
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Filter by type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   {typeOptions.map(type => (
                     <SelectItem key={type} value={type}>{type}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <Select value={selectedUnit} onValueChange={setSelectedUnit}>
+              <Select value={selectedUnit || "all"} onValueChange={(value) => setSelectedUnit(value === "all" ? "" : value)}>
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Filter by unit" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Units</SelectItem>
+                  <SelectItem value="all">All Units</SelectItem>
                   {unitOptions.map(unit => (
                     <SelectItem key={unit} value={unit}>{unit}</SelectItem>
                   ))}
