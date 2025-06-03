@@ -4,6 +4,9 @@ import { storage } from "./storage";
 import { 
   insertIsolationPointSchema, 
   insertSavedListSchema, 
+  insertProcedureExecutionSchema,
+  insertPointExecutionSchema,
+  insertSafetyMetricSchema,
   filterSchema 
 } from "@shared/schema";
 import { z } from "zod";
@@ -182,6 +185,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.send(csvHeader + csvData);
     } catch (error) {
       res.status(500).json({ message: "Failed to export isolation list" });
+    }
+  });
+
+  // Analytics & Reporting routes
+  app.get("/api/analytics/execution-statistics", async (req, res) => {
+    try {
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+      const stats = await storage.getExecutionStatistics(startDate, endDate);
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch execution statistics" });
+    }
+  });
+
+  app.get("/api/analytics/safety-statistics", async (req, res) => {
+    try {
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+      const stats = await storage.getSafetyStatistics(startDate, endDate);
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch safety statistics" });
+    }
+  });
+
+  app.get("/api/analytics/equipment-statistics", async (req, res) => {
+    try {
+      const stats = await storage.getEquipmentStatistics();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch equipment statistics" });
+    }
+  });
+
+  app.get("/api/analytics/performance-metrics", async (req, res) => {
+    try {
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+      const metrics = await storage.getPerformanceMetrics(startDate, endDate);
+      res.json(metrics);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch performance metrics" });
+    }
+  });
+
+  app.get("/api/analytics/compliance-report", async (req, res) => {
+    try {
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+      const report = await storage.getComplianceReport(startDate, endDate);
+      res.json(report);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch compliance report" });
+    }
+  });
+
+  // Procedure Executions routes
+  app.get("/api/procedure-executions", async (req, res) => {
+    try {
+      const executions = await storage.getAllProcedureExecutions();
+      res.json(executions);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch procedure executions" });
+    }
+  });
+
+  app.post("/api/procedure-executions", async (req, res) => {
+    try {
+      const executionData = insertProcedureExecutionSchema.parse(req.body);
+      const execution = await storage.createProcedureExecution(executionData);
+      res.status(201).json(execution);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid execution data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to create procedure execution" });
+      }
+    }
+  });
+
+  app.put("/api/procedure-executions/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = insertProcedureExecutionSchema.partial().parse(req.body);
+      const execution = await storage.updateProcedureExecution(id, updateData);
+      if (!execution) {
+        return res.status(404).json({ message: "Procedure execution not found" });
+      }
+      res.json(execution);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid update data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to update procedure execution" });
+      }
+    }
+  });
+
+  // Safety Metrics routes
+  app.get("/api/safety-metrics/:procedureId", async (req, res) => {
+    try {
+      const procedureId = parseInt(req.params.procedureId);
+      const metrics = await storage.getSafetyMetricsByProcedure(procedureId);
+      res.json(metrics);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch safety metrics" });
+    }
+  });
+
+  app.post("/api/safety-metrics", async (req, res) => {
+    try {
+      const metricData = insertSafetyMetricSchema.parse(req.body);
+      const metric = await storage.createSafetyMetric(metricData);
+      res.status(201).json(metric);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid metric data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to create safety metric" });
+      }
     }
   });
 
