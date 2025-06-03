@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { 
   Plus, Edit, Trash2, Upload, Download, Save, X, 
-  AlertCircle, CheckCircle, Database, FileUp 
+  AlertCircle, CheckCircle, Database, FileUp, ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -243,6 +244,15 @@ export default function IsolationPointsManagement() {
               <div className="text-sm text-muted-foreground">Database Administration</div>
             </div>
             <div className="flex items-center space-x-3">
+              <Link href="/">
+                <Button
+                  variant="outline"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to LOTO
+                </Button>
+              </Link>
               <Button
                 variant="outline"
                 onClick={handleExportTemplate}

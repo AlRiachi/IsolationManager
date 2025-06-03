@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Shield, Download, Search } from "lucide-react";
+import { Link } from "wouter";
+import { Shield, Download, Search, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -155,6 +156,15 @@ export default function IsolationManagement() {
                   className="w-80 pl-10"
                 />
               </div>
+              <Link href="/management">
+                <Button
+                  variant="outline"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Manage Database
+                </Button>
+              </Link>
               <Button
                 onClick={handleExportLists}
                 className="bg-safety-orange hover:bg-safety-orange/90 text-white"

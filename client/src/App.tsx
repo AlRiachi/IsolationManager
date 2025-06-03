@@ -4,12 +4,14 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import IsolationManagement from "@/pages/isolation-management";
+import IsolationPointsManagement from "@/pages/isolation-points-management";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={IsolationManagement} />
+      <Route path="/management" component={IsolationPointsManagement} />
       <Route component={NotFound} />
     </Switch>
   );
