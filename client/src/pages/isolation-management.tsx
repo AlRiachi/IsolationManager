@@ -105,6 +105,18 @@ export default function IsolationManagement() {
     setCurrentList(newOrder);
   };
 
+  const handleUpdateIsolationMethod = (pointId: number, newMethod: string) => {
+    setCurrentList(currentList.map(point => 
+      point.id === pointId 
+        ? { ...point, isolationMethod: newMethod }
+        : point
+    ));
+    toast({
+      title: "Method Updated",
+      description: "Isolation method has been updated for this procedure.",
+    });
+  };
+
   const handleViewDetails = (point: IsolationPoint) => {
     setSelectedPoint(point);
     setShowDetailModal(true);
@@ -237,6 +249,7 @@ export default function IsolationManagement() {
               savedLists={savedLists}
               onRemoveFromList={handleRemoveFromList}
               onReorderList={handleReorderList}
+              onUpdateIsolationMethod={handleUpdateIsolationMethod}
               onClose={() => setListBuilderOpen(false)}
               onExport={() => {
                 const pointIds = currentList.map(point => point.id);

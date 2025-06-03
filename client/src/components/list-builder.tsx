@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   X, Save, FileText, Download, Share, Trash2, 
-  GripVertical, ChevronUp, ChevronDown, Info 
+  GripVertical, ChevronUp, ChevronDown, Info, Edit2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import type { IsolationPoint, SavedList, InsertSavedList } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
@@ -18,9 +19,27 @@ interface ListBuilderProps {
   savedLists: SavedList[];
   onRemoveFromList: (pointId: number) => void;
   onReorderList: (newOrder: IsolationPoint[]) => void;
+  onUpdateIsolationMethod: (pointId: number, newMethod: string) => void;
   onClose: () => void;
   onExport: () => void;
 }
+
+const methodOptions = [
+  "Close (Normal Operation)",
+  "Close and LOTO",
+  "Close and Tag Only",
+  "Remove Earth (Normal Operation)",
+  "Earth",
+  "Insert Blind",
+  "Off and LOTO",
+  "Off and Tag Only",
+  "Open (Normal Operation)",
+  "Open and LOTO",
+  "Open and Tag Only",
+  "Remove Blind (Normal Operation)",
+  "Rack-In (Normal Operation)",
+  "Rack-Out and LOTO"
+];
 
 const getTypeColor = (type: string) => {
   switch (type.toLowerCase()) {
@@ -37,12 +56,14 @@ export default function ListBuilder({
   savedLists,
   onRemoveFromList,
   onReorderList,
+  onUpdateIsolationMethod,
   onClose,
   onExport,
 }: ListBuilderProps) {
   const [listName, setListName] = useState("");
   const [listDescription, setListDescription] = useState("");
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [editingMethodId, setEditingMethodId] = useState<number | null>(null);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -224,7 +245,41 @@ export default function ListBuilder({
                       </div>
                       <div className="flex items-center space-x-4 text-xs text-muted-foreground pl-6">
                         <span>Unit: {point.unit}</span>
-                        <span>Method: {point.isolationMethod}</span>
+                        <div className="flex items-center space-x-2">
+                          <span>Method:</span>
+                          {editingMethodId === point.id ? (
+                            <Select 
+                              value={point.isolationMethod} 
+                              onValueChange={(value) => {
+                                onUpdateIsolationMethod(point.id, value);
+                                setEditingMethodId(null);
+                              }}
+                            >
+                              <SelectTrigger className="w-48 h-6 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {methodOptions.map(method => (
+                                  <SelectItem key={method} value={method} className="text-xs">
+                                    {method}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <div className="flex items-center space-x-1">
+                              <span className="text-foreground font-medium">{point.isolationMethod}</span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setEditingMethodId(point.id)}
+                                className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                              >
+                                <Edit2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="flex flex-col items-end space-y-1 ml-2">
