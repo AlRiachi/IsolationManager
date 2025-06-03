@@ -110,6 +110,10 @@ export class MemStorage implements IStorage {
       const isolationPoint: IsolationPoint = {
         ...point,
         id,
+        panelKks: point.panelKks || null,
+        loadKks: point.loadKks || null,
+        isolationPosition: point.isolationPosition || null,
+        specialInstructions: point.specialInstructions || null,
         createdAt: new Date()
       };
       this.isolationPointsMap.set(id, isolationPoint);
@@ -134,6 +138,7 @@ export class MemStorage implements IStorage {
       const savedList: SavedList = {
         ...list,
         id,
+        description: list.description || null,
         createdAt: new Date(),
         updatedAt: new Date()
       };
@@ -155,6 +160,10 @@ export class MemStorage implements IStorage {
     const point: IsolationPoint = {
       ...insertPoint,
       id,
+      panelKks: insertPoint.panelKks || null,
+      loadKks: insertPoint.loadKks || null,
+      isolationPosition: insertPoint.isolationPosition || null,
+      specialInstructions: insertPoint.specialInstructions || null,
       createdAt: new Date()
     };
     this.isolationPointsMap.set(id, point);
