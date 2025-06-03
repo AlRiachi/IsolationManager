@@ -28,11 +28,20 @@ const typeOptions = [
 ];
 
 const methodOptions = [
-  { value: "Circuit Breaker", label: "Circuit Breaker", count: 42 },
-  { value: "Motor Operated Valve", label: "Motor Operated Valve", count: 31 },
-  { value: "Manual Valve", label: "Manual Valve", count: 18 },
-  { value: "Disconnect Switch", label: "Disconnect Switch", count: 16 },
-  { value: "Manual Isolation", label: "Manual Isolation", count: 12 },
+  { value: "Close (Normal Operation)", label: "Close (Normal Operation)", count: 8 },
+  { value: "Close and LOTO", label: "Close and LOTO", count: 12 },
+  { value: "Close and Tag Only", label: "Close and Tag Only", count: 6 },
+  { value: "Remove Earth (Normal Operation)", label: "Remove Earth (Normal Operation)", count: 3 },
+  { value: "Earth", label: "Earth", count: 5 },
+  { value: "Insert Blind", label: "Insert Blind", count: 4 },
+  { value: "Off and LOTO", label: "Off and LOTO", count: 15 },
+  { value: "Off and Tag Only", label: "Off and Tag Only", count: 7 },
+  { value: "Open (Normal Operation)", label: "Open (Normal Operation)", count: 9 },
+  { value: "Open and LOTO", label: "Open and LOTO", count: 11 },
+  { value: "Open and Tag Only", label: "Open and Tag Only", count: 5 },
+  { value: "Remove Blind (Normal Operation)", label: "Remove Blind (Normal Operation)", count: 2 },
+  { value: "Rack-In (Normal Operation)", label: "Rack-In (Normal Operation)", count: 6 },
+  { value: "Rack-Out and LOTO", label: "Rack-Out and LOTO", count: 8 },
 ];
 
 const positionOptions = [

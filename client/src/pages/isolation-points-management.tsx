@@ -35,14 +35,20 @@ type FormData = z.infer<typeof formSchema>;
 const typeOptions = ["Electrical", "Mechanical", "Hydraulic", "Pneumatic"];
 const unitOptions = ["Unit 1", "Unit 2", "Unit 3", "Unit 4"];
 const methodOptions = [
-  "Circuit Breaker",
-  "Motor Operated Valve", 
-  "Manual Valve",
-  "Disconnect Switch",
-  "Manual Isolation",
-  "Contactor",
-  "Fuse",
-  "Pneumatic Valve"
+  "Close (Normal Operation)",
+  "Close and LOTO",
+  "Close and Tag Only",
+  "Remove Earth (Normal Operation)",
+  "Earth",
+  "Insert Blind",
+  "Off and LOTO",
+  "Off and Tag Only",
+  "Open (Normal Operation)",
+  "Open and LOTO",
+  "Open and Tag Only",
+  "Remove Blind (Normal Operation)",
+  "Rack-In (Normal Operation)",
+  "Rack-Out and LOTO"
 ];
 const positionOptions = ["Open", "Closed", "Energized", "De-energized", "Normal", "Isolated"];
 
