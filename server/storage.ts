@@ -7,6 +7,8 @@ import {
   type InsertSavedList,
   type FilterOptions
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, or, like, inArray } from "drizzle-orm";
 
 export interface IStorage {
   // Isolation Points
@@ -261,4 +263,117 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  // Isolation Points methods
+  async getAllIsolationPoints(): Promise<IsolationPoint[]> {
+    return await db.select().from(isolationPoints);
+  }
+
+  async getIsolationPoint(id: number): Promise<IsolationPoint | undefined> {
+    const [point] = await db.select().from(isolationPoints).where(eq(isolationPoints.id, id));
+    return point || undefined;
+  }
+
+  async createIsolationPoint(insertPoint: InsertIsolationPoint): Promise<IsolationPoint> {
+    const [point] = await db
+      .insert(isolationPoints)
+      .values(insertPoint)
+      .returning();
+    return point;
+  }
+
+  async updateIsolationPoint(id: number, updateData: Partial<InsertIsolationPoint>): Promise<IsolationPoint | undefined> {
+    const [point] = await db
+      .update(isolationPoints)
+      .set(updateData)
+      .where(eq(isolationPoints.id, id))
+      .returning();
+    return point || undefined;
+  }
+
+  async deleteIsolationPoint(id: number): Promise<boolean> {
+    const result = await db
+      .delete(isolationPoints)
+      .where(eq(isolationPoints.id, id));
+    return result.rowCount > 0;
+  }
+
+  async searchIsolationPoints(filters: FilterOptions): Promise<IsolationPoint[]> {
+    let query = db.select().from(isolationPoints);
+    const conditions = [];
+
+    if (filters.search) {
+      const searchTerm = `%${filters.search}%`;
+      conditions.push(
+        or(
+          like(isolationPoints.kks, searchTerm),
+          like(isolationPoints.description, searchTerm),
+          like(isolationPoints.unit, searchTerm),
+          like(isolationPoints.type, searchTerm),
+          like(isolationPoints.isolationMethod, searchTerm),
+          like(isolationPoints.panelKks, searchTerm),
+          like(isolationPoints.loadKks, searchTerm),
+          like(isolationPoints.specialInstructions, searchTerm)
+        )
+      );
+    }
+
+    if (filters.units && filters.units.length > 0) {
+      conditions.push(inArray(isolationPoints.unit, filters.units));
+    }
+
+    if (filters.types && filters.types.length > 0) {
+      conditions.push(inArray(isolationPoints.type, filters.types));
+    }
+
+    if (filters.methods && filters.methods.length > 0) {
+      conditions.push(inArray(isolationPoints.isolationMethod, filters.methods));
+    }
+
+    if (filters.positions && filters.positions.length > 0) {
+      conditions.push(inArray(isolationPoints.normalPosition, filters.positions));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    return await query;
+  }
+
+  // Saved Lists methods
+  async getAllSavedLists(): Promise<SavedList[]> {
+    return await db.select().from(savedLists);
+  }
+
+  async getSavedList(id: number): Promise<SavedList | undefined> {
+    const [list] = await db.select().from(savedLists).where(eq(savedLists.id, id));
+    return list || undefined;
+  }
+
+  async createSavedList(insertList: InsertSavedList): Promise<SavedList> {
+    const [list] = await db
+      .insert(savedLists)
+      .values(insertList)
+      .returning();
+    return list;
+  }
+
+  async updateSavedList(id: number, updateData: Partial<InsertSavedList>): Promise<SavedList | undefined> {
+    const [list] = await db
+      .update(savedLists)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(savedLists.id, id))
+      .returning();
+    return list || undefined;
+  }
+
+  async deleteSavedList(id: number): Promise<boolean> {
+    const result = await db
+      .delete(savedLists)
+      .where(eq(savedLists.id, id));
+    return result.rowCount > 0;
+  }
+}
+
+export const storage = new DatabaseStorage();
