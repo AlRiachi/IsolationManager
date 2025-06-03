@@ -248,32 +248,47 @@ export default function ListBuilder({
                         <div className="flex items-center space-x-2">
                           <span>Method:</span>
                           {editingMethodId === point.id ? (
-                            <Select 
-                              value={point.isolationMethod} 
-                              onValueChange={(value) => {
-                                onUpdateIsolationMethod(point.id, value);
-                                setEditingMethodId(null);
-                              }}
-                            >
-                              <SelectTrigger className="w-48 h-6 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {methodOptions.map(method => (
-                                  <SelectItem key={method} value={method} className="text-xs">
-                                    {method}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          ) : (
-                            <div className="flex items-center space-x-1">
-                              <span className="text-foreground font-medium">{point.isolationMethod}</span>
+                            <div className="flex items-center space-x-2">
+                              <Select 
+                                value={point.isolationMethod} 
+                                onValueChange={(value) => {
+                                  onUpdateIsolationMethod(point.id, value);
+                                  setEditingMethodId(null);
+                                }}
+                                open={true}
+                              >
+                                <SelectTrigger className="w-52 h-7 text-xs border-blue-300 bg-blue-50">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {methodOptions.map(method => (
+                                    <SelectItem key={method} value={method} className="text-xs">
+                                      {method}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <Button
                                 variant="ghost"
                                 size="sm"
+                                onClick={() => setEditingMethodId(null)}
+                                className="h-6 w-6 p-0 text-gray-500 hover:text-gray-700"
+                                title="Cancel editing"
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center space-x-2">
+                              <span className="text-foreground font-medium bg-muted px-2 py-1 rounded text-xs">
+                                {point.isolationMethod}
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
                                 onClick={() => setEditingMethodId(point.id)}
-                                className="h-4 w-4 p-0 text-muted-foreground hover:text-foreground"
+                                className="h-6 w-6 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50 border-blue-200"
+                                title="Edit isolation method"
                               >
                                 <Edit2 className="h-3 w-3" />
                               </Button>
