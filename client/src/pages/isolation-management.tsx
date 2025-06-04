@@ -47,8 +47,8 @@ export default function IsolationManagement() {
 
   // Export mutation
   const exportMutation = useMutation({
-    mutationFn: async (isolationPointIds: number[]) => {
-      const response = await apiRequest("POST", "/api/export/isolation-list", { isolationPointIds });
+    mutationFn: async (data: { isolationPointIds: number[]; jsaNumber?: string; workOrder?: string; jobDescription?: string; listName?: string }) => {
+      const response = await apiRequest("POST", "/api/export/isolation-list", data);
       return response.blob();
     },
     onSuccess: (blob) => {
@@ -122,7 +122,7 @@ export default function IsolationManagement() {
     setShowDetailModal(true);
   };
 
-  const handleExportLists = () => {
+  const handleExportLists = (exportData?: { listName?: string; jsaNumber?: string; workOrder?: string; jobDescription?: string }) => {
     if (currentList.length === 0) {
       toast({
         title: "No Points Selected",
@@ -133,7 +133,10 @@ export default function IsolationManagement() {
     }
     
     const pointIds = currentList.map(point => point.id);
-    exportMutation.mutate(pointIds);
+    exportMutation.mutate({
+      isolationPointIds: pointIds,
+      ...exportData
+    });
   };
 
   const handleAddSelectedToList = () => {
@@ -178,7 +181,7 @@ export default function IsolationManagement() {
                 </Button>
               </Link>
               <Button
-                onClick={handleExportLists}
+                onClick={() => handleExportLists()}
                 className="bg-safety-orange hover:bg-safety-orange/90 text-white"
                 disabled={exportMutation.isPending}
               >
@@ -251,10 +254,7 @@ export default function IsolationManagement() {
               onReorderList={handleReorderList}
               onUpdateIsolationMethod={handleUpdateIsolationMethod}
               onClose={() => setListBuilderOpen(false)}
-              onExport={() => {
-                const pointIds = currentList.map(point => point.id);
-                exportMutation.mutate(pointIds);
-              }}
+              onExport={handleExportLists}
             />
           )}
         </main>

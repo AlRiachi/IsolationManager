@@ -21,7 +21,7 @@ interface ListBuilderProps {
   onReorderList: (newOrder: IsolationPoint[]) => void;
   onUpdateIsolationMethod: (pointId: number, newMethod: string) => void;
   onClose: () => void;
-  onExport: () => void;
+  onExport: (exportData?: { listName?: string; jsaNumber?: string; workOrder?: string; jobDescription?: string }) => void;
 }
 
 const methodOptions = [
@@ -369,7 +369,7 @@ export default function ListBuilder({
         </div>
         
         <Button
-          onClick={onExport}
+          onClick={() => onExport({ listName: listName || undefined, jsaNumber: jsaNumber || undefined, workOrder: workOrder || undefined, jobDescription: jobDescription || undefined })}
           disabled={currentList.length === 0}
           className="w-full bg-industrial-blue hover:bg-industrial-blue/90 text-white"
         >
@@ -380,7 +380,7 @@ export default function ListBuilder({
         <div className="flex space-x-2">
           <Button
             variant="outline"
-            onClick={onExport}
+            onClick={() => onExport({ listName: listName || undefined, jsaNumber: jsaNumber || undefined, workOrder: workOrder || undefined, jobDescription: jobDescription || undefined })}
             disabled={currentList.length === 0}
             className="flex-1"
           >
