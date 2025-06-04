@@ -7,7 +7,8 @@ import {
   insertProcedureExecutionSchema,
   insertPointExecutionSchema,
   insertSafetyMetricSchema,
-  filterSchema 
+  filterSchema,
+  type IsolationPoint
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -203,6 +204,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.send(csvContent);
     } catch (error) {
       res.status(500).json({ message: "Failed to export isolation list" });
+    }
+  });
+
+  // Export isolation list to PDF
+  app.post("/api/export/isolation-list-pdf", async (req, res) => {
+    try {
+      const { isolationPointIds, jsaNumber, workOrder, jobDescription, listName } = req.body;
+
+      if (!Array.isArray(isolationPointIds) || isolationPointIds.length === 0) {
+        return res.status(400).json({ error: "No isolation points provided" });
+      }
+
+      const points = await Promise.all(
+        isolationPointIds.map(id => storage.getIsolationPoint(id))
+      );
+
+      const validPoints = points.filter((point): point is IsolationPoint => point !== undefined);
+
+      if (validPoints.length === 0) {
+        return res.status(404).json({ error: "No valid isolation points found" });
+      }
+
+      // Return the data for client-side PDF generation
+      res.json({
+        points: validPoints,
+        metadata: {
+          listName: listName || 'Unnamed LOTO Procedure',
+          jsaNumber: jsaNumber || 'Not Specified',
+          workOrder: workOrder || 'Not Specified', 
+          jobDescription: jobDescription || 'Not Specified',
+          generatedDate: new Date().toISOString(),
+          totalPoints: validPoints.length
+        }
+      });
+
+    } catch (error) {
+      console.error("PDF export error:", error);
+      res.status(500).json({ error: "Failed to prepare PDF export data" });
     }
   });
 
