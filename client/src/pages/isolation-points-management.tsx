@@ -68,6 +68,10 @@ export default function IsolationPointsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<string>("");
   const [selectedUnit, setSelectedUnit] = useState<string>("");
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importPreview, setImportPreview] = useState<any[]>([]);
+  const [importErrors, setImportErrors] = useState<string[]>([]);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -163,6 +167,164 @@ export default function IsolationPointsManagement() {
       });
     },
   });
+
+  // Bulk import mutation
+  const bulkImportMutation = useMutation({
+    mutationFn: async (points: InsertIsolationPoint[]) => {
+      const results = [];
+      for (const point of points) {
+        try {
+          const response = await apiRequest("POST", "/api/isolation-points", point);
+          results.push({ success: true, point, data: response });
+        } catch (error: any) {
+          results.push({ success: false, point, error: error.message });
+        }
+      }
+      return results;
+    },
+    onSuccess: (results) => {
+      const successCount = results.filter(r => r.success).length;
+      const errorCount = results.filter(r => !r.success).length;
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/isolation-points"] });
+      
+      if (errorCount === 0) {
+        toast({
+          title: "Import Successful",
+          description: `${successCount} isolation points imported successfully.`,
+        });
+      } else {
+        toast({
+          title: "Import Completed with Errors",
+          description: `${successCount} points imported, ${errorCount} failed.`,
+          variant: "destructive",
+        });
+      }
+      
+      setShowImportDialog(false);
+      setImportFile(null);
+      setImportPreview([]);
+      setImportErrors([]);
+    },
+    onError: () => {
+      toast({
+        title: "Import Failed",
+        description: "Failed to import isolation points.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // CSV parsing function
+  const parseCSV = (text: string) => {
+    const lines = text.split('\n');
+    if (lines.length < 2) throw new Error('CSV must have at least a header and one data row');
+    
+    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+    const data = [];
+    const errors = [];
+    
+    // Expected headers
+    const expectedHeaders = ['kks', 'unit', 'description', 'type', 'isolationMethod', 'normalPosition', 'panelKks', 'loadKks', 'isolationPosition', 'specialInstructions'];
+    
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      
+      const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+      const row: any = {};
+      
+      headers.forEach((header, index) => {
+        row[header] = values[index] || '';
+      });
+      
+      // Validate required fields
+      try {
+        const validatedRow = {
+          kks: row.kks || '',
+          unit: row.unit || '',
+          description: row.description || '',
+          type: row.type || '',
+          isolationMethod: row.isolationMethod || '',
+          normalPosition: row.normalPosition || '',
+          panelKks: row.panelKks || null,
+          loadKks: row.loadKks || null,
+          isolationPosition: row.isolationPosition || null,
+          specialInstructions: row.specialInstructions || null,
+        };
+        
+        // Basic validation
+        if (!validatedRow.kks) throw new Error('KKS is required');
+        if (!validatedRow.unit) throw new Error('Unit is required');
+        if (!validatedRow.description) throw new Error('Description is required');
+        if (!validatedRow.type) throw new Error('Type is required');
+        if (!validatedRow.isolationMethod) throw new Error('Isolation method is required');
+        if (!validatedRow.normalPosition) throw new Error('Normal position is required');
+        
+        data.push(validatedRow);
+      } catch (error) {
+        errors.push(`Row ${i}: ${error.message}`);
+      }
+    }
+    
+    return { data, errors };
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.name.endsWith('.csv')) {
+      toast({
+        title: "Invalid File",
+        description: "Please select a CSV file.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setImportFile(file);
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result as string;
+        const { data, errors } = parseCSV(text);
+        setImportPreview(data);
+        setImportErrors(errors);
+      } catch (error) {
+        toast({
+          title: "Parse Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleImport = () => {
+    if (importPreview.length === 0) return;
+    bulkImportMutation.mutate(importPreview);
+  };
+
+  const downloadTemplate = () => {
+    const headers = ['kks', 'unit', 'description', 'type', 'isolationMethod', 'normalPosition', 'panelKks', 'loadKks', 'isolationPosition', 'specialInstructions'];
+    const sampleData = [
+      '1AAA01AA001,Unit 1,Main Feed Water Pump Motor,Electrical,Open and LOTO,Closed,1ECA01AA001,1PAA01AA001,Open,Verify pump is stopped before isolation'
+    ];
+    
+    const csvContent = [headers.join(','), ...sampleData].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'isolation_points_template.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   const handleEdit = (point: IsolationPoint) => {
     setEditingPoint(point);
