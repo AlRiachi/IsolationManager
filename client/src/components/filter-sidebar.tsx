@@ -90,10 +90,10 @@ export default function FilterSidebar({
   });
 
   return (
-    <aside className="w-80 bg-white shadow-lg border-r border-border overflow-y-auto scrollbar-thin">
-      <div className="p-4 border-b border-border">
+    <aside className="w-full lg:w-80 bg-white shadow-lg border-r border-border overflow-y-auto scrollbar-thin">
+      <div className="p-3 sm:p-4 border-b border-border">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Advanced Filters</h2>
+          <h2 className="text-base sm:text-lg font-semibold text-foreground">Advanced Filters</h2>
           {hasActiveFilters && (
             <Button
               variant="ghost"
@@ -102,7 +102,7 @@ export default function FilterSidebar({
               className="text-muted-foreground hover:text-foreground"
             >
               <RotateCcw className="h-4 w-4 mr-1" />
-              Clear All
+              <span className="hidden sm:inline">Clear All</span>
             </Button>
           )}
         </div>

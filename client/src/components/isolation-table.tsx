@@ -118,26 +118,26 @@ export default function IsolationTable({
   }
 
   return (
-    <>
-      <div className="flex-1 overflow-auto bg-white">
-        <table className="w-full table-fixed">
-          <thead className="bg-muted/50 sticky top-0 z-10">
-            <tr>
-              <th className="w-12 px-4 py-3 text-left">
-                <Checkbox
-                  checked={allCurrentSelected}
-                  onCheckedChange={handleSelectAll}
-                  ref={(el) => {
-                    if (el) {
-                      el.indeterminate = someCurrentSelected && !allCurrentSelected;
-                    }
-                  }}
-                />
-              </th>
-              <th className="w-32 px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                <button
-                  onClick={() => handleSort('kks')}
-                  className="flex items-center space-x-1 hover:text-foreground"
+    <div className="flex-1 overflow-auto bg-white">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[800px] table-fixed">
+            <thead className="bg-muted/50 sticky top-0 z-10">
+              <tr>
+                <th className="w-12 px-2 sm:px-4 py-3 text-left">
+                  <Checkbox
+                    checked={allCurrentSelected}
+                    onCheckedChange={handleSelectAll}
+                    ref={(el) => {
+                      if (el) {
+                        el.indeterminate = someCurrentSelected && !allCurrentSelected;
+                      }
+                    }}
+                  />
+                </th>
+                <th className="w-28 sm:w-32 px-2 sm:px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <button
+                    onClick={() => handleSort('kks')}
+                    className="flex items-center space-x-1 hover:text-foreground touch-manipulation"
                 >
                   <span>KKS</span>
                   <SortIcon field="kks" />
