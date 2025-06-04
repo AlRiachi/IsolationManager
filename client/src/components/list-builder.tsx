@@ -170,11 +170,11 @@ export default function ListBuilder({
   };
 
   return (
-    <aside className="w-96 bg-white shadow-lg border-l border-border flex flex-col">
-      <div className="p-4 border-b border-border">
+    <aside className="w-full lg:w-96 bg-white shadow-lg border-l border-border flex flex-col max-h-screen lg:max-h-none">
+      <div className="p-3 sm:p-4 border-b border-border">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">LOTO List Builder</h2>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <h2 className="text-base sm:text-lg font-semibold text-foreground">LOTO List Builder</h2>
+          <Button variant="ghost" size="sm" onClick={onClose} className="lg:hidden">
             <X className="h-4 w-4" />
           </Button>
         </div>

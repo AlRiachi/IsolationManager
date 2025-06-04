@@ -78,7 +78,13 @@ export default function IsolationTable({
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       const allIds = currentPoints.map(point => point.id);
-      onSelectionChange([...new Set([...selectedPoints, ...allIds])]);
+      const uniqueIds = [...selectedPoints];
+      allIds.forEach(id => {
+        if (!uniqueIds.includes(id)) {
+          uniqueIds.push(id);
+        }
+      });
+      onSelectionChange(uniqueIds);
     } else {
       const currentIds = currentPoints.map(point => point.id);
       onSelectionChange(selectedPoints.filter(id => !currentIds.includes(id)));
@@ -127,11 +133,6 @@ export default function IsolationTable({
                   <Checkbox
                     checked={allCurrentSelected}
                     onCheckedChange={handleSelectAll}
-                    ref={(el) => {
-                      if (el) {
-                        el.indeterminate = someCurrentSelected && !allCurrentSelected;
-                      }
-                    }}
                   />
                 </th>
                 <th className="w-28 sm:w-32 px-2 sm:px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -317,6 +318,6 @@ export default function IsolationTable({
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
