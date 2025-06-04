@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import type { IsolationPoint, SavedList, InsertSavedList } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
+import { generateLOTOPDF } from "@/lib/pdf-generator";
 
 interface ListBuilderProps {
   currentList: IsolationPoint[];
@@ -93,6 +94,28 @@ export default function ListBuilder({
       toast({
         title: "Save Failed",
         description: "Failed to save the isolation list.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // PDF export mutation
+  const pdfExportMutation = useMutation({
+    mutationFn: async (exportData: { isolationPointIds: number[]; jsaNumber?: string; workOrder?: string; jobDescription?: string; listName?: string }) => {
+      const response = await apiRequest("POST", "/api/export/isolation-list-pdf", exportData);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      generateLOTOPDF(data);
+      toast({
+        title: "PDF Generated",
+        description: "Enterprise LOTO procedure PDF has been downloaded.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "PDF Export Failed",
+        description: "Failed to generate PDF. Please try again.",
         variant: "destructive",
       });
     },
@@ -209,14 +232,49 @@ export default function ListBuilder({
             rows={2}
             className="resize-none"
           />
-          <Button
-            onClick={handleSaveList}
-            disabled={saveListMutation.isPending || !listName.trim() || currentList.length === 0}
-            className="w-full bg-safety-green hover:bg-safety-green/90 text-white"
-          >
-            <Save className="h-4 w-4 mr-2" />
-            Save List
-          </Button>
+          <div className="space-y-2">
+            <Button
+              onClick={handleSaveList}
+              disabled={saveListMutation.isPending || !listName.trim() || currentList.length === 0}
+              className="w-full bg-safety-green hover:bg-safety-green/90 text-white"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Save List
+            </Button>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <Button
+                onClick={() => onExport({ listName, jsaNumber, workOrder, jobDescription })}
+                disabled={currentList.length === 0}
+                variant="outline"
+                className="flex-1"
+                size="sm"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export CSV
+              </Button>
+              
+              <Button
+                onClick={() => {
+                  const pointIds = currentList.map(point => point.id);
+                  pdfExportMutation.mutate({
+                    isolationPointIds: pointIds,
+                    listName: listName || 'LOTO Procedure',
+                    jsaNumber,
+                    workOrder,
+                    jobDescription
+                  });
+                }}
+                disabled={currentList.length === 0 || pdfExportMutation.isPending}
+                variant="outline"
+                className="flex-1 bg-industrial-blue text-white hover:bg-industrial-blue/90"
+                size="sm"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Export PDF
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
