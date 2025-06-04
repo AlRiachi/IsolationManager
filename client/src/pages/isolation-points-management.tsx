@@ -262,7 +262,7 @@ export default function IsolationPointsManagement() {
         if (!validatedRow.normalPosition) throw new Error('Normal position is required');
         
         data.push(validatedRow);
-      } catch (error) {
+      } catch (error: any) {
         errors.push(`Row ${i}: ${error.message}`);
       }
     }
@@ -292,7 +292,7 @@ export default function IsolationPointsManagement() {
         const { data, errors } = parseCSV(text);
         setImportPreview(data);
         setImportErrors(errors);
-      } catch (error) {
+      } catch (error: any) {
         toast({
           title: "Parse Error",
           description: error.message,
@@ -423,7 +423,7 @@ export default function IsolationPointsManagement() {
               </Link>
               <Button
                 variant="outline"
-                onClick={handleExportTemplate}
+                onClick={downloadTemplate}
                 className="text-muted-foreground"
               >
                 <Download className="h-4 w-4 mr-2" />
@@ -431,6 +431,7 @@ export default function IsolationPointsManagement() {
               </Button>
               <Button
                 variant="outline"
+                onClick={() => setShowImportDialog(true)}
                 className="text-muted-foreground"
               >
                 <FileUp className="h-4 w-4 mr-2" />
@@ -881,6 +882,150 @@ export default function IsolationPointsManagement() {
               </div>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Import Dialog */}
+      <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Bulk Import Isolation Points</span>
+              <Button variant="ghost" size="sm" onClick={() => setShowImportDialog(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {/* Instructions */}
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium mb-2">Import Instructions</h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Upload a CSV file with isolation point data</li>
+                <li>• Required columns: kks, unit, description, type, isolationMethod, normalPosition</li>
+                <li>• Optional columns: panelKks, loadKks, isolationPosition, specialInstructions</li>
+                <li>• Download the template below for the correct format</li>
+              </ul>
+            </div>
+
+            {/* File Upload */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <Button
+                  variant="outline"
+                  onClick={downloadTemplate}
+                  className="flex items-center space-x-2"
+                >
+                  <Download className="h-4 w-4" />
+                  <span>Download Template</span>
+                </Button>
+                <div className="text-sm text-muted-foreground">
+                  Download the CSV template to ensure correct formatting
+                </div>
+              </div>
+              
+              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="csv-upload"
+                />
+                <label
+                  htmlFor="csv-upload"
+                  className="cursor-pointer flex flex-col items-center space-y-2"
+                >
+                  <FileUp className="h-8 w-8 text-muted-foreground" />
+                  <div className="text-sm text-muted-foreground">
+                    Click to upload CSV file or drag and drop
+                  </div>
+                  {importFile && (
+                    <div className="text-sm font-medium text-foreground">
+                      Selected: {importFile.name}
+                    </div>
+                  )}
+                </label>
+              </div>
+            </div>
+
+            {/* Import Errors */}
+            {importErrors.length > 0 && (
+              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+                <h4 className="font-medium text-destructive mb-2">Validation Errors</h4>
+                <div className="text-sm text-destructive space-y-1 max-h-32 overflow-y-auto">
+                  {importErrors.map((error, index) => (
+                    <div key={index}>• {error}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Preview */}
+            {importPreview.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="font-medium">Preview ({importPreview.length} points)</h4>
+                <div className="border rounded-lg max-h-64 overflow-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="text-left p-2 font-medium">KKS</th>
+                        <th className="text-left p-2 font-medium">Unit</th>
+                        <th className="text-left p-2 font-medium">Description</th>
+                        <th className="text-left p-2 font-medium">Type</th>
+                        <th className="text-left p-2 font-medium">Method</th>
+                        <th className="text-left p-2 font-medium">Position</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {importPreview.slice(0, 10).map((point, index) => (
+                        <tr key={index} className="border-t">
+                          <td className="p-2 font-mono text-xs">{point.kks}</td>
+                          <td className="p-2">{point.unit}</td>
+                          <td className="p-2 truncate max-w-48">{point.description}</td>
+                          <td className="p-2">{point.type}</td>
+                          <td className="p-2 truncate max-w-32">{point.isolationMethod}</td>
+                          <td className="p-2">{point.normalPosition}</td>
+                        </tr>
+                      ))}
+                      {importPreview.length > 10 && (
+                        <tr className="border-t">
+                          <td colSpan={6} className="p-2 text-center text-muted-foreground">
+                            ... and {importPreview.length - 10} more points
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex justify-end space-x-3 pt-4 border-t border-border">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowImportDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleImport}
+                disabled={importPreview.length === 0 || importErrors.length > 0 || bulkImportMutation.isPending}
+                className="bg-industrial-blue hover:bg-industrial-blue/90 text-white"
+              >
+                {bulkImportMutation.isPending ? (
+                  <>Importing...</>
+                ) : (
+                  <>
+                    <FileUp className="h-4 w-4 mr-2" />
+                    Import {importPreview.length} Points
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

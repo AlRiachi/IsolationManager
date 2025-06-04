@@ -12,7 +12,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={IsolationManagement} />
-      <Route path="/management" component={IsolationPointsManagement} />
+      <Route path="/isolation-points" component={IsolationPointsManagement} />
       <Route path="/analytics" component={AnalyticsDashboard} />
       <Route component={NotFound} />
     </Switch>
