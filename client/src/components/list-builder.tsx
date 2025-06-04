@@ -62,6 +62,9 @@ export default function ListBuilder({
 }: ListBuilderProps) {
   const [listName, setListName] = useState("");
   const [listDescription, setListDescription] = useState("");
+  const [jsaNumber, setJsaNumber] = useState("");
+  const [workOrder, setWorkOrder] = useState("");
+  const [jobDescription, setJobDescription] = useState("");
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [editingMethodId, setEditingMethodId] = useState<number | null>(null);
   
@@ -82,6 +85,9 @@ export default function ListBuilder({
       });
       setListName("");
       setListDescription("");
+      setJsaNumber("");
+      setWorkOrder("");
+      setJobDescription("");
     },
     onError: () => {
       toast({
@@ -115,6 +121,9 @@ export default function ListBuilder({
       name: listName.trim(),
       description: listDescription.trim() || undefined,
       isolationPointIds: currentList.map(point => point.id),
+      jsaNumber: jsaNumber.trim() || undefined,
+      workOrder: workOrder.trim() || undefined,
+      jobDescription: jobDescription.trim() || undefined,
     };
 
     saveListMutation.mutate(listData);

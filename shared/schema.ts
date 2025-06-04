@@ -22,6 +22,9 @@ export const savedLists = pgTable("saved_lists", {
   name: text("name").notNull(),
   description: text("description"),
   isolationPointIds: jsonb("isolation_point_ids").$type<number[]>().notNull(),
+  jsaNumber: text("jsa_number"),
+  workOrder: text("work_order"),
+  jobDescription: text("job_description"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
