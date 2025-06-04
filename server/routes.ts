@@ -166,7 +166,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Export functionality
   app.post("/api/export/isolation-list", async (req, res) => {
     try {
-      const { isolationPointIds } = req.body;
+      const { isolationPointIds, jsaNumber, workOrder, jobDescription, listName } = req.body;
       if (!Array.isArray(isolationPointIds)) {
         return res.status(400).json({ message: "Invalid isolation point IDs" });
       }
@@ -174,15 +174,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const points = await storage.getAllIsolationPoints();
       const selectedPoints = points.filter(p => isolationPointIds.includes(p.id));
 
-      // Generate CSV format for export
+      // Generate CSV with work management fields
+      let csvContent = "";
+      
+      // Add header information if provided
+      if (listName || jsaNumber || workOrder || jobDescription) {
+        csvContent += "LOTO PROCEDURE EXPORT\n";
+        csvContent += "===================\n";
+        if (listName) csvContent += `Procedure Name:,${listName}\n`;
+        if (jsaNumber) csvContent += `JSA Number:,${jsaNumber}\n`;
+        if (workOrder) csvContent += `Work Order:,${workOrder}\n`;
+        if (jobDescription) csvContent += `Job Description:,${jobDescription}\n`;
+        csvContent += `Export Date:,${new Date().toISOString().split('T')[0]}\n`;
+        csvContent += `Total Points:,${selectedPoints.length}\n`;
+        csvContent += "\n";
+      }
+
+      // Generate CSV format for isolation points
       const csvHeader = "KKS,Unit,Description,Type,Panel KKS,Load KKS,Method,Normal Position,Isolation Position,Special Instructions\n";
       const csvData = selectedPoints.map(p => 
         `"${p.kks}","${p.unit}","${p.description}","${p.type}","${p.panelKks || ''}","${p.loadKks || ''}","${p.isolationMethod}","${p.normalPosition}","${p.isolationPosition || ''}","${p.specialInstructions || ''}"`
       ).join('\n');
 
+      csvContent += csvHeader + csvData;
+
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', 'attachment; filename="isolation-points.csv"');
-      res.send(csvHeader + csvData);
+      res.send(csvContent);
     } catch (error) {
       res.status(500).json({ message: "Failed to export isolation list" });
     }

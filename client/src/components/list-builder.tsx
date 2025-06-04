@@ -192,6 +192,23 @@ export default function ListBuilder({
             rows={2}
             className="resize-none"
           />
+          <Input
+            placeholder="JSA Number (optional)..."
+            value={jsaNumber}
+            onChange={(e) => setJsaNumber(e.target.value)}
+          />
+          <Input
+            placeholder="Work Order (optional)..."
+            value={workOrder}
+            onChange={(e) => setWorkOrder(e.target.value)}
+          />
+          <Textarea
+            placeholder="Job Description (optional)..."
+            value={jobDescription}
+            onChange={(e) => setJobDescription(e.target.value)}
+            rows={2}
+            className="resize-none"
+          />
           <Button
             onClick={handleSaveList}
             disabled={saveListMutation.isPending || !listName.trim() || currentList.length === 0}

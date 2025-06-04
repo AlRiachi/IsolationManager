@@ -240,6 +240,21 @@ export default function FilterSidebar({
                     <div className="text-xs text-muted-foreground">
                       {list.isolationPointIds.length} isolation points
                     </div>
+                    {list.jsaNumber && (
+                      <div className="text-xs text-muted-foreground">
+                        JSA: {list.jsaNumber}
+                      </div>
+                    )}
+                    {list.workOrder && (
+                      <div className="text-xs text-muted-foreground">
+                        WO: {list.workOrder}
+                      </div>
+                    )}
+                    {list.jobDescription && (
+                      <div className="text-xs text-muted-foreground truncate">
+                        {list.jobDescription}
+                      </div>
+                    )}
                   </div>
                   <div className="flex space-x-1 ml-2">
                     <div className={`w-3 h-3 rounded-full ${
