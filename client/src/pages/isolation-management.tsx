@@ -168,7 +168,7 @@ export default function IsolationManagement() {
                   className="w-80 pl-10"
                 />
               </div>
-              <Link href="/management">
+              <Link href="/isolation-points">
                 <Button
                   variant="outline"
                   className="text-muted-foreground hover:text-foreground"
