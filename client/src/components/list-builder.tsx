@@ -253,12 +253,12 @@ export default function ListBuilder({
                 onDragEnd={handleDragEnd}
                 onDragOver={(e) => handleDragOver(e, index)}
               >
-                <CardContent className="p-3">
-                  <div className="flex items-start justify-between">
+                <CardContent className="p-2 sm:p-3">
+                  <div className="flex items-start justify-between touch-manipulation">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2 mb-1">
-                        <GripVertical className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        <span className="text-sm font-medium text-industrial-blue font-mono">
+                        <GripVertical className="h-4 w-4 text-muted-foreground flex-shrink-0 touch-manipulation" />
+                        <span className="text-xs sm:text-sm font-medium text-industrial-blue font-mono">
                           {point.kks}
                         </span>
                         <Badge variant="outline" className={`${getTypeColor(point.type)} text-xs`}>
