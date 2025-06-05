@@ -998,29 +998,118 @@ export default function IsolationPointsManagement() {
               </div>
             )}
 
+            {/* Import Progress */}
+            {isImporting && (
+              <div className="space-y-3 bg-muted/50 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Import Progress</span>
+                  <span className="text-sm text-muted-foreground">{Math.round(importProgress)}%</span>
+                </div>
+                <div className="w-full bg-background rounded-full h-2">
+                  <div 
+                    className="bg-industrial-blue h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${importProgress}%` }}
+                  />
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Processing isolation points in batches...
+                </div>
+              </div>
+            )}
+
             {/* Actions */}
-            <div className="flex justify-end space-x-3 pt-4 border-t border-border">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowImportDialog(false)}
-              >
-                Cancel
-              </Button>
+            <div className="flex justify-between items-center pt-4 border-t border-border">
               <Button
-                onClick={handleImport}
-                disabled={importPreview.length === 0 || importErrors.length > 0 || bulkImportMutation.isPending}
-                className="bg-industrial-blue hover:bg-industrial-blue/90 text-white"
+                variant="destructive"
+                onClick={() => setShowClearDialog(true)}
+                size="sm"
+                className="flex items-center space-x-2"
+                disabled={isImporting}
               >
-                {bulkImportMutation.isPending ? (
-                  <>Importing...</>
-                ) : (
-                  <>
-                    <FileUp className="h-4 w-4 mr-2" />
-                    Import {importPreview.length} Points
-                  </>
-                )}
+                <Trash2 className="h-4 w-4" />
+                <span>Clear Database</span>
               </Button>
+              
+              <div className="flex space-x-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowImportDialog(false)}
+                  disabled={isImporting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleImport}
+                  disabled={importPreview.length === 0 || importErrors.length > 0 || isImporting}
+                  className="bg-industrial-blue hover:bg-industrial-blue/90 text-white"
+                >
+                  {isImporting ? (
+                    <>Importing...</>
+                  ) : (
+                    <>
+                      <FileUp className="h-4 w-4 mr-2" />
+                      Import {importPreview.length} Points
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Database Clear Confirmation Dialog */}
+      <Dialog open={showClearDialog} onOpenChange={setShowClearDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2 text-destructive">
+              <Trash2 className="h-5 w-5" />
+              <span>Clear Database</span>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <AlertCircle className="h-5 w-5 text-destructive mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-destructive mb-1">Warning: This action cannot be undone</h4>
+                  <p className="text-sm text-destructive/80">
+                    This will permanently delete all isolation points from the database. 
+                    This is useful for recovering from import errors or starting fresh.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-sm text-muted-foreground">
+              Current database contains <strong>{isolationPoints.length}</strong> isolation points.
+            </p>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowClearDialog(false)}
+              disabled={clearDatabaseMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => clearDatabaseMutation.mutate()}
+              disabled={clearDatabaseMutation.isPending}
+              className="flex items-center space-x-2"
+            >
+              {clearDatabaseMutation.isPending ? (
+                <>Clearing...</>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4" />
+                  <span>Clear All Data</span>
+                </>
+              )}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
