@@ -71,6 +71,9 @@ export default function IsolationPointsManagement() {
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importPreview, setImportPreview] = useState<any[]>([]);
   const [importErrors, setImportErrors] = useState<string[]>([]);
+  const [importProgress, setImportProgress] = useState(0);
+  const [isImporting, setIsImporting] = useState(false);
+  const [showClearDialog, setShowClearDialog] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -167,21 +170,43 @@ export default function IsolationPointsManagement() {
     },
   });
 
-  // Bulk import mutation
+  // Bulk import mutation with progress tracking
   const bulkImportMutation = useMutation({
     mutationFn: async (points: InsertIsolationPoint[]) => {
+      setIsImporting(true);
+      setImportProgress(0);
+      
       const results = [];
-      for (const point of points) {
-        try {
-          const response = await apiRequest("POST", "/api/isolation-points", point);
-          results.push({ success: true, point, data: response });
-        } catch (error: any) {
-          results.push({ success: false, point, error: error.message });
+      const batchSize = 10; // Process in smaller batches
+      
+      for (let i = 0; i < points.length; i += batchSize) {
+        const batch = points.slice(i, i + batchSize);
+        
+        for (const point of batch) {
+          try {
+            const response = await apiRequest("POST", "/api/isolation-points", point);
+            results.push({ success: true, point, data: response });
+          } catch (error: any) {
+            results.push({ success: false, point, error: error.message });
+          }
+        }
+        
+        // Update progress
+        const progress = Math.min(100, ((i + batchSize) / points.length) * 100);
+        setImportProgress(progress);
+        
+        // Small delay between batches
+        if (i + batchSize < points.length) {
+          await new Promise(resolve => setTimeout(resolve, 50));
         }
       }
+      
       return results;
     },
     onSuccess: (results) => {
+      setIsImporting(false);
+      setImportProgress(100);
+      
       const successCount = results.filter(r => r.success).length;
       const errorCount = results.filter(r => !r.success).length;
       
@@ -189,12 +214,12 @@ export default function IsolationPointsManagement() {
       
       if (errorCount === 0) {
         toast({
-          title: "Import Successful",
+          title: "Import Completed Successfully",
           description: `${successCount} isolation points imported successfully.`,
         });
       } else {
         toast({
-          title: "Import Completed with Errors",
+          title: "Import Completed with Issues",
           description: `${successCount} points imported, ${errorCount} failed.`,
           variant: "destructive",
         });
@@ -204,11 +229,37 @@ export default function IsolationPointsManagement() {
       setImportFile(null);
       setImportPreview([]);
       setImportErrors([]);
+      setImportProgress(0);
     },
-    onError: () => {
+    onError: (error) => {
+      setIsImporting(false);
+      setImportProgress(0);
       toast({
         title: "Import Failed",
-        description: "Failed to import isolation points.",
+        description: error.message || "Failed to import isolation points.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Database clear mutation
+  const clearDatabaseMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("DELETE", "/api/isolation-points/clear-all");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/isolation-points"] });
+      toast({
+        title: "Database Cleared",
+        description: "All isolation points have been removed from the database.",
+      });
+      setShowClearDialog(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Clear Failed",
+        description: error.message || "Failed to clear database.",
         variant: "destructive",
       });
     },

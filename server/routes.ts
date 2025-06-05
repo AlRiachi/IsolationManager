@@ -96,6 +96,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Clear all isolation points
+  app.delete("/api/isolation-points/clear-all", async (req, res) => {
+    try {
+      const points = await storage.getAllIsolationPoints();
+      for (const point of points) {
+        await storage.deleteIsolationPoint(point.id);
+      }
+      res.json({ message: `Cleared ${points.length} isolation points successfully` });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to clear database" });
+    }
+  });
+
   // Saved Lists routes
   app.get("/api/saved-lists", async (req, res) => {
     try {
