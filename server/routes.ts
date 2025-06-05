@@ -83,6 +83,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Clear all isolation points (must come before /:id route)
+  app.delete("/api/isolation-points/clear-all", async (req, res) => {
+    try {
+      const points = await storage.getAllIsolationPoints();
+      for (const point of points) {
+        await storage.deleteIsolationPoint(point.id);
+      }
+      res.json({ message: `Cleared ${points.length} isolation points successfully` });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to clear database" });
+    }
+  });
+
   app.delete("/api/isolation-points/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -93,19 +106,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Isolation point deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete isolation point" });
-    }
-  });
-
-  // Clear all isolation points
-  app.delete("/api/isolation-points/clear-all", async (req, res) => {
-    try {
-      const points = await storage.getAllIsolationPoints();
-      for (const point of points) {
-        await storage.deleteIsolationPoint(point.id);
-      }
-      res.json({ message: `Cleared ${points.length} isolation points successfully` });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to clear database" });
     }
   });
 
