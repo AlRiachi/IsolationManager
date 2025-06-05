@@ -22,11 +22,11 @@ import { apiRequest } from "@/lib/queryClient";
 import { z } from "zod";
 
 const formSchema = insertIsolationPointSchema.extend({
-  kks: z.string().min(1, "KKS code is required"),
-  unit: z.string().min(1, "Unit is required"),
-  description: z.string().min(1, "Description is required"),
-  type: z.string().min(1, "Type is required"),
-  isolationMethod: z.string().min(1, "Isolation method is required"),
+  kks: z.string().optional(),
+  unit: z.string().optional(),
+  description: z.string().optional(),
+  type: z.string().optional(),
+  isolationMethod: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -252,12 +252,10 @@ export default function IsolationPointsManagement() {
           specialInstructions: row.specialInstructions || null,
         };
         
-        // Basic validation
-        if (!validatedRow.kks) throw new Error('KKS is required');
-        if (!validatedRow.unit) throw new Error('Unit is required');
-        if (!validatedRow.description) throw new Error('Description is required');
-        if (!validatedRow.type) throw new Error('Type is required');
-        if (!validatedRow.isolationMethod) throw new Error('Isolation method is required');
+        // Basic validation - only check for completely empty rows
+        if (!validatedRow.kks && !validatedRow.unit && !validatedRow.description && !validatedRow.type && !validatedRow.isolationMethod) {
+          throw new Error('Row is completely empty');
+        }
         
         data.push(validatedRow);
       } catch (error: any) {
