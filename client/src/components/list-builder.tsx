@@ -276,7 +276,6 @@ export default function ListBuilder({
           </div>
         </div>
       </div>
-
       {/* Current List */}
       <div className="flex-1 overflow-hidden flex flex-col">
         <div className="p-4 border-b border-border">
@@ -288,7 +287,7 @@ export default function ListBuilder({
           </div>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: 'thin', maxHeight: 'calc(100vh - 400px)' }}>
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 pl-[3px] pr-[3px] pt-[0px] pb-[0px]" style={{ scrollbarWidth: 'thin', maxHeight: 'calc(100vh - 400px)' }}>
           {currentList.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-muted-foreground text-sm">
@@ -417,7 +416,6 @@ export default function ListBuilder({
           )}
         </div>
       </div>
-
       {/* List Actions */}
       <div className="p-4 border-t border-border space-y-3">
         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
