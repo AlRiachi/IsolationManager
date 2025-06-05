@@ -8,13 +8,12 @@ import { useToast } from "@/hooks/use-toast";
 import type { IsolationPoint, SavedList, FilterOptions } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import IsolationTable from "@/components/isolation-table";
-import FilterSidebar from "@/components/filter-sidebar";
+
 import ListBuilder from "@/components/list-builder";
 import DetailModal from "@/components/detail-modal";
 
 export default function IsolationManagement() {
   const [globalSearch, setGlobalSearch] = useState("");
-  const [filters, setFilters] = useState<FilterOptions>({});
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
   const [currentList, setCurrentList] = useState<IsolationPoint[]>([]);
   const [selectedPoint, setSelectedPoint] = useState<IsolationPoint | null>(null);
@@ -34,15 +33,23 @@ export default function IsolationManagement() {
     queryKey: ["/api/saved-lists"],
   });
 
-  // Search isolation points with filters
-  const { data: filteredPoints = [], isLoading: searchLoading } = useQuery<IsolationPoint[]>({
-    queryKey: ["/api/isolation-points/search", { ...filters, search: globalSearch }],
-    enabled: Object.keys(filters).length > 0 || globalSearch.length > 0,
-  });
-
-  // Use filtered points if filters are applied, otherwise use all points
-  const displayPoints = Object.keys(filters).length > 0 || globalSearch.length > 0 
-    ? filteredPoints 
+  // Filter points locally based on global search
+  const displayPoints = globalSearch.length > 0 
+    ? allIsolationPoints.filter(point => {
+        const searchTerm = globalSearch.toLowerCase();
+        return (
+          (point.kks?.toLowerCase() || '').includes(searchTerm) ||
+          (point.description?.toLowerCase() || '').includes(searchTerm) ||
+          (point.unit?.toLowerCase() || '').includes(searchTerm) ||
+          (point.type?.toLowerCase() || '').includes(searchTerm) ||
+          (point.isolationMethod?.toLowerCase() || '').includes(searchTerm) ||
+          (point.panelKks?.toLowerCase() || '').includes(searchTerm) ||
+          (point.loadKks?.toLowerCase() || '').includes(searchTerm) ||
+          (point.normalPosition?.toLowerCase() || '').includes(searchTerm) ||
+          (point.isolationPosition?.toLowerCase() || '').includes(searchTerm) ||
+          (point.specialInstructions?.toLowerCase() || '').includes(searchTerm)
+        );
+      })
     : allIsolationPoints;
 
   // Export mutation
@@ -78,9 +85,7 @@ export default function IsolationManagement() {
     setGlobalSearch(value);
   };
 
-  const handleFilterChange = (newFilters: FilterOptions) => {
-    setFilters(newFilters);
-  };
+
 
   const handlePointSelection = (pointIds: number[]) => {
     setSelectedPoints(pointIds);
@@ -216,27 +221,69 @@ export default function IsolationManagement() {
       </div>
 
       <div className="flex flex-col lg:flex-row h-[calc(100vh-73px)] lg:h-[calc(100vh-73px)]">
-        {/* Filter Sidebar - Collapsible on mobile */}
-        <div className={`${listBuilderOpen ? 'block' : 'hidden'} lg:block`}>
-          <FilterSidebar
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            savedLists={savedLists}
-            onLoadList={(list) => {
-              const listPoints = allIsolationPoints.filter(point => 
-                list.isolationPointIds.includes(point.id)
-              );
-              setCurrentList(listPoints);
-              toast({
-                title: "List Loaded",
-                description: `Loaded "${list.name}" with ${listPoints.length} points.`,
-              });
-              // Auto-hide sidebar on mobile after loading
-              if (window.innerWidth < 1024) {
-                setListBuilderOpen(false);
-              }
-            }}
-          />
+        {/* Saved Lists Sidebar - Collapsible on mobile */}
+        <div className={`${listBuilderOpen ? 'block' : 'hidden'} lg:block w-full lg:w-80 bg-white shadow-lg border-r border-border overflow-y-auto`}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-foreground">Saved Lists & Presets</h3>
+            </div>
+
+            <div className="space-y-2">
+              {savedLists.map((list) => (
+                <div
+                  key={list.id}
+                  className="cursor-pointer hover:bg-muted/50 transition-colors border rounded-lg p-3"
+                  onClick={() => {
+                    const listPoints = allIsolationPoints.filter(point => 
+                      (list.isolationPointIds || []).includes(point.id)
+                    );
+                    setCurrentList(listPoints);
+                    toast({
+                      title: "List Loaded",
+                      description: `Loaded "${list.name}" with ${listPoints.length} points.`,
+                    });
+                    // Auto-hide sidebar on mobile after loading
+                    if (window.innerWidth < 1024) {
+                      setListBuilderOpen(false);
+                    }
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-foreground truncate">
+                        {list.name}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {(list.isolationPointIds || []).length} isolation points
+                      </div>
+                      {list.jsaNumber && (
+                        <div className="text-xs text-muted-foreground">
+                          JSA: {list.jsaNumber}
+                        </div>
+                      )}
+                      {list.workOrder && (
+                        <div className="text-xs text-muted-foreground">
+                          WO: {list.workOrder}
+                        </div>
+                      )}
+                      {list.jobDescription && (
+                        <div className="text-xs text-muted-foreground truncate">
+                          {list.jobDescription}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex space-x-1 ml-2">
+                      <div className={`w-3 h-3 rounded-full ${
+                        list.name.includes('Emergency') ? 'bg-caution-amber' :
+                        list.name.includes('Unit 1') ? 'bg-safety-green' :
+                        'bg-industrial-blue'
+                      }`}></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Main Content */}
@@ -268,7 +315,7 @@ export default function IsolationManagement() {
 
             <IsolationTable
               points={displayPoints}
-              isLoading={pointsLoading || searchLoading}
+              isLoading={pointsLoading}
               selectedPoints={selectedPoints}
               onSelectionChange={handlePointSelection}
               onViewDetails={handleViewDetails}
