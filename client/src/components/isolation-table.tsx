@@ -61,8 +61,8 @@ export default function IsolationTable({
   };
 
   const sortedPoints = [...points].sort((a, b) => {
-    const aValue = a[sortField];
-    const bValue = b[sortField];
+    const aValue = a[sortField] || '';
+    const bValue = b[sortField] || '';
     const direction = sortDirection === 'asc' ? 1 : -1;
     
     if (aValue < bValue) return -1 * direction;
@@ -205,8 +205,8 @@ export default function IsolationTable({
                   {point.unit}
                 </td>
                 <td className="px-4 py-4 text-sm text-foreground">
-                  <div className="truncate" title={point.description}>
-                    {point.description}
+                  <div className="truncate" title={point.description || ''}>
+                    {point.description || ''}
                   </div>
                 </td>
                 <td className="px-4 py-4">

@@ -4,14 +4,14 @@ import { z } from "zod";
 
 export const isolationPoints = pgTable("isolation_points", {
   id: serial("id").primaryKey(),
-  kks: text("kks").notNull().unique(),
-  unit: text("unit").notNull(),
-  description: text("description").notNull(),
-  type: text("type").notNull(), // Electrical, Mechanical, Hydraulic, Pneumatic
+  kks: text("kks"),
+  unit: text("unit"),
+  description: text("description"),
+  type: text("type"), // Electrical, Mechanical, Hydraulic, Pneumatic
   panelKks: text("panel_kks"),
   loadKks: text("load_kks"),
-  isolationMethod: text("isolation_method").notNull(),
-  normalPosition: text("normal_position").notNull(),
+  isolationMethod: text("isolation_method"),
+  normalPosition: text("normal_position"),
   isolationPosition: text("isolation_position"),
   specialInstructions: text("special_instructions"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -19,9 +19,9 @@ export const isolationPoints = pgTable("isolation_points", {
 
 export const savedLists = pgTable("saved_lists", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
+  name: text("name"),
   description: text("description"),
-  isolationPointIds: jsonb("isolation_point_ids").$type<number[]>().notNull(),
+  isolationPointIds: jsonb("isolation_point_ids").$type<number[]>(),
   jsaNumber: text("jsa_number"),
   workOrder: text("work_order"),
   jobDescription: text("job_description"),
@@ -32,17 +32,17 @@ export const savedLists = pgTable("saved_lists", {
 export const procedureExecutions = pgTable("procedure_executions", {
   id: serial("id").primaryKey(),
   savedListId: integer("saved_list_id").references(() => savedLists.id),
-  executionDate: timestamp("execution_date").notNull(),
-  startTime: timestamp("start_time").notNull(),
+  executionDate: timestamp("execution_date"),
+  startTime: timestamp("start_time"),
   endTime: timestamp("end_time"),
-  status: text("status").notNull(), // "in-progress", "completed", "failed", "cancelled"
-  executedBy: text("executed_by").notNull(),
+  status: text("status"), // "in-progress", "completed", "failed", "cancelled"
+  executedBy: text("executed_by"),
   supervisedBy: text("supervised_by"),
-  unit: text("unit").notNull(),
+  unit: text("unit"),
   workOrderNumber: text("work_order_number"),
-  totalPoints: integer("total_points").notNull(),
-  completedPoints: integer("completed_points").notNull().default(0),
-  safetyIncidents: integer("safety_incidents").notNull().default(0),
+  totalPoints: integer("total_points"),
+  completedPoints: integer("completed_points").default(0),
+  safetyIncidents: integer("safety_incidents").default(0),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -51,13 +51,13 @@ export const pointExecutions = pgTable("point_executions", {
   id: serial("id").primaryKey(),
   procedureExecutionId: integer("procedure_execution_id").references(() => procedureExecutions.id),
   isolationPointId: integer("isolation_point_id").references(() => isolationPoints.id),
-  executionOrder: integer("execution_order").notNull(),
-  isolationMethod: text("isolation_method").notNull(),
+  executionOrder: integer("execution_order"),
+  isolationMethod: text("isolation_method"),
   executionTime: timestamp("execution_time"),
   executedBy: text("executed_by"),
   verifiedBy: text("verified_by"),
   verificationTime: timestamp("verification_time"),
-  status: text("status").notNull(), // "pending", "isolated", "verified", "failed"
+  status: text("status"), // "pending", "isolated", "verified", "failed"
   actualPosition: text("actual_position"),
   lockApplied: boolean("lock_applied").default(false),
   tagApplied: boolean("tag_applied").default(false),
@@ -68,12 +68,12 @@ export const pointExecutions = pgTable("point_executions", {
 export const safetyMetrics = pgTable("safety_metrics", {
   id: serial("id").primaryKey(),
   procedureExecutionId: integer("procedure_execution_id").references(() => procedureExecutions.id),
-  metricType: text("metric_type").notNull(), // "near_miss", "safety_observation", "incident", "compliance_check"
-  severity: text("severity").notNull(), // "low", "medium", "high", "critical"
-  description: text("description").notNull(),
+  metricType: text("metric_type"), // "near_miss", "safety_observation", "incident", "compliance_check"
+  severity: text("severity"), // "low", "medium", "high", "critical"
+  description: text("description"),
   correctionAction: text("correction_action"),
-  reportedBy: text("reported_by").notNull(),
-  reportedAt: timestamp("reported_at").notNull(),
+  reportedBy: text("reported_by"),
+  reportedAt: timestamp("reported_at"),
   resolvedAt: timestamp("resolved_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
