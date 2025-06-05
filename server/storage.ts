@@ -336,17 +336,19 @@ export class DatabaseStorage implements IStorage {
     const conditions = [];
 
     if (filters.search) {
-      const searchTerm = `%${filters.search}%`;
+      const searchTerm = `%${filters.search.toLowerCase()}%`;
       conditions.push(
         or(
-          like(isolationPoints.kks, searchTerm),
-          like(isolationPoints.description, searchTerm),
-          like(isolationPoints.unit, searchTerm),
-          like(isolationPoints.type, searchTerm),
-          like(isolationPoints.isolationMethod, searchTerm),
-          like(isolationPoints.panelKks, searchTerm),
-          like(isolationPoints.loadKks, searchTerm),
-          like(isolationPoints.specialInstructions, searchTerm)
+          like(sql`LOWER(COALESCE(${isolationPoints.kks}, ''))`, searchTerm),
+          like(sql`LOWER(COALESCE(${isolationPoints.description}, ''))`, searchTerm),
+          like(sql`LOWER(COALESCE(${isolationPoints.unit}, ''))`, searchTerm),
+          like(sql`LOWER(COALESCE(${isolationPoints.type}, ''))`, searchTerm),
+          like(sql`LOWER(COALESCE(${isolationPoints.isolationMethod}, ''))`, searchTerm),
+          like(sql`LOWER(COALESCE(${isolationPoints.panelKks}, ''))`, searchTerm),
+          like(sql`LOWER(COALESCE(${isolationPoints.loadKks}, ''))`, searchTerm),
+          like(sql`LOWER(COALESCE(${isolationPoints.normalPosition}, ''))`, searchTerm),
+          like(sql`LOWER(COALESCE(${isolationPoints.isolationPosition}, ''))`, searchTerm),
+          like(sql`LOWER(COALESCE(${isolationPoints.specialInstructions}, ''))`, searchTerm)
         )
       );
     }
