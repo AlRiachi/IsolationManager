@@ -101,7 +101,7 @@ export default function ListBuilder({
 
   // PDF export mutation
   const pdfExportMutation = useMutation({
-    mutationFn: async (exportData: { isolationPointIds: number[]; jsaNumber?: string; workOrder?: string; jobDescription?: string; listName?: string }) => {
+    mutationFn: async (exportData: { isolationPointIds?: number[]; isolationPointsList?: IsolationPoint[]; jsaNumber?: string; workOrder?: string; jobDescription?: string; listName?: string }) => {
       const response = await apiRequest("POST", "/api/export/isolation-list-pdf", exportData);
       return response.json();
     },
@@ -256,9 +256,8 @@ export default function ListBuilder({
               
               <Button
                 onClick={() => {
-                  const pointIds = currentList.map(point => point.id);
                   pdfExportMutation.mutate({
-                    isolationPointIds: pointIds,
+                    isolationPointsList: currentList,
                     listName: listName || 'LOTO Procedure',
                     jsaNumber,
                     workOrder,
@@ -289,7 +288,7 @@ export default function ListBuilder({
           </div>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 max-h-96 lg:max-h-none" style={{ scrollbarWidth: 'thin' }}>
           {currentList.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-muted-foreground text-sm">

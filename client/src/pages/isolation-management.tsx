@@ -47,7 +47,7 @@ export default function IsolationManagement() {
 
   // Export mutation
   const exportMutation = useMutation({
-    mutationFn: async (data: { isolationPointIds: number[]; jsaNumber?: string; workOrder?: string; jobDescription?: string; listName?: string }) => {
+    mutationFn: async (data: { isolationPointIds?: number[]; isolationPointsList?: IsolationPoint[]; jsaNumber?: string; workOrder?: string; jobDescription?: string; listName?: string }) => {
       const response = await apiRequest("POST", "/api/export/isolation-list", data);
       return response.blob();
     },
@@ -138,9 +138,9 @@ export default function IsolationManagement() {
       return;
     }
     
-    const pointIds = currentList.map(point => point.id);
+    // Use current list data directly to preserve isolation method changes
     exportMutation.mutate({
-      isolationPointIds: pointIds,
+      isolationPointsList: currentList,
       ...exportData
     });
   };

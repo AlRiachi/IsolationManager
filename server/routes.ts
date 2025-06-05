@@ -167,13 +167,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Export functionality
   app.post("/api/export/isolation-list", async (req, res) => {
     try {
-      const { isolationPointIds, jsaNumber, workOrder, jobDescription, listName } = req.body;
-      if (!Array.isArray(isolationPointIds)) {
-        return res.status(400).json({ message: "Invalid isolation point IDs" });
-      }
+      const { isolationPointIds, isolationPointsList, jsaNumber, workOrder, jobDescription, listName } = req.body;
+      
+      let selectedPoints: any[] = [];
 
-      const points = await storage.getAllIsolationPoints();
-      const selectedPoints = points.filter(p => isolationPointIds.includes(p.id));
+      // Use provided list if available (preserves isolation method changes)
+      if (isolationPointsList && Array.isArray(isolationPointsList) && isolationPointsList.length > 0) {
+        selectedPoints = isolationPointsList;
+      } else if (Array.isArray(isolationPointIds) && isolationPointIds.length > 0) {
+        // Fallback to fetching by IDs
+        const points = await storage.getAllIsolationPoints();
+        selectedPoints = points.filter(p => isolationPointIds.includes(p.id));
+      } else {
+        return res.status(400).json({ message: "Invalid isolation point data" });
+      }
 
       // Generate CSV with work management fields
       let csvContent = "";
@@ -210,20 +217,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Export isolation list to PDF
   app.post("/api/export/isolation-list-pdf", async (req, res) => {
     try {
-      const { isolationPointIds, jsaNumber, workOrder, jobDescription, listName } = req.body;
+      const { isolationPointIds, isolationPointsList, jsaNumber, workOrder, jobDescription, listName } = req.body;
 
-      if (!Array.isArray(isolationPointIds) || isolationPointIds.length === 0) {
-        return res.status(400).json({ error: "No isolation points provided" });
+      let validPoints: any[] = [];
+
+      // Use provided list if available (preserves isolation method changes)
+      if (isolationPointsList && Array.isArray(isolationPointsList) && isolationPointsList.length > 0) {
+        validPoints = isolationPointsList;
+      } else if (Array.isArray(isolationPointIds) && isolationPointIds.length > 0) {
+        // Fallback to fetching by IDs
+        const points = await Promise.all(
+          isolationPointIds.map(id => storage.getIsolationPoint(id))
+        );
+        validPoints = points.filter((point): point is IsolationPoint => point !== undefined);
       }
 
-      const points = await Promise.all(
-        isolationPointIds.map(id => storage.getIsolationPoint(id))
-      );
-
-      const validPoints = points.filter((point): point is IsolationPoint => point !== undefined);
-
       if (validPoints.length === 0) {
-        return res.status(404).json({ error: "No valid isolation points found" });
+        return res.status(400).json({ error: "No isolation points provided" });
       }
 
       // Return the data for client-side PDF generation
