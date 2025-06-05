@@ -143,12 +143,12 @@ export class EnterprisePDFGenerator {
         cellPadding: 3
       },
       columnStyles: {
-        0: { cellWidth: 20, halign: 'center', fontStyle: 'bold' },
-        1: { cellWidth: 40, fontStyle: 'bold', textColor: [21, 101, 192] },
-        2: { cellWidth: 25 },
-        3: { cellWidth: 90 },
-        4: { cellWidth: 60 },
-        5: { cellWidth: 40 }
+        0: { cellWidth: 15, halign: 'center', fontStyle: 'bold' },
+        1: { cellWidth: 35, fontStyle: 'bold', textColor: [21, 101, 192] },
+        2: { cellWidth: 20 },
+        3: { cellWidth: 80 },
+        4: { cellWidth: 50 },
+        5: { cellWidth: 35 }
       },
       styles: {
         overflow: 'linebreak',

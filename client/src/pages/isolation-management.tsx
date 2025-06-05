@@ -91,6 +91,12 @@ export default function IsolationManagement() {
       !currentList.some(listPoint => listPoint.id === point.id)
     );
     setCurrentList([...currentList, ...newPoints]);
+    
+    // Ensure list builder is visible when points are added
+    if (!listBuilderOpen) {
+      setListBuilderOpen(true);
+    }
+    
     toast({
       title: "Added to List",
       description: `${newPoints.length} point(s) added to current list.`,
