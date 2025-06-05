@@ -287,7 +287,7 @@ export default function ListBuilder({
           </div>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100" style={{ maxHeight: 'calc(100vh - 400px)' }}>
+        <div className="flex-1 overflow-y-auto px-2 py-1 space-y-2" style={{ maxHeight: 'calc(100vh - 320px)' }}>
           {currentList.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-muted-foreground text-sm">
@@ -298,8 +298,9 @@ export default function ListBuilder({
               </div>
             </div>
           ) : (
-            currentList.map((point, index) => (
-              <Card
+            <div className="space-y-2 pb-4">
+              {currentList.map((point, index) => (
+                <Card
                 key={`${point.id}-${index}`}
                 className={`draggable-item cursor-move hover:shadow-md transition-all ${
                   draggedIndex === index ? 'dragging opacity-50' : ''
@@ -317,10 +318,6 @@ export default function ListBuilder({
                         <span className="text-xs sm:text-sm font-medium text-industrial-blue font-mono">
                           {point.kks || ''}
                         </span>
-                        <Badge variant="outline" className={`${getTypeColor(point.type || '')} text-xs`}>
-                          <span className="w-1.5 h-1.5 bg-current rounded-full mr-1"></span>
-                          {point.type || ''}
-                        </Badge>
                       </div>
                       <div className="text-xs text-muted-foreground mb-2 pl-6">
                         {point.description || ''}
@@ -411,8 +408,9 @@ export default function ListBuilder({
                     </div>
                   </div>
                 </CardContent>
-              </Card>
-            ))
+                </Card>
+              ))}
+            </div>
           )}
         </div>
       </div>
