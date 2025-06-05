@@ -287,7 +287,7 @@ export default function ListBuilder({
           </div>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 pl-[3px] pr-[3px] pt-[0px] pb-[0px]" style={{ scrollbarWidth: 'thin', maxHeight: 'calc(100vh - 400px)' }}>
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100" style={{ maxHeight: 'calc(100vh - 400px)' }}>
           {currentList.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-muted-foreground text-sm">

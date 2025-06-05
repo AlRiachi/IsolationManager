@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Shield, Download, Search, Settings } from "lucide-react";
+import { Shield, Download, Search, Settings, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -19,6 +19,7 @@ export default function IsolationManagement() {
   const [selectedPoint, setSelectedPoint] = useState<IsolationPoint | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [listBuilderOpen, setListBuilderOpen] = useState(true);
+  const [savedListsCollapsed, setSavedListsCollapsed] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -226,63 +227,73 @@ export default function IsolationManagement() {
           <div className="p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-foreground">Saved Lists & Presets</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSavedListsCollapsed(!savedListsCollapsed)}
+                className="p-1 h-6 w-6"
+              >
+                {savedListsCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
             </div>
 
-            <div className="space-y-2">
-              {savedLists.map((list) => (
-                <div
-                  key={list.id}
-                  className="cursor-pointer hover:bg-muted/50 transition-colors border rounded-lg p-3"
-                  onClick={() => {
-                    const listPoints = allIsolationPoints.filter(point => 
-                      (list.isolationPointIds || []).includes(point.id)
-                    );
-                    setCurrentList(listPoints);
-                    toast({
-                      title: "List Loaded",
-                      description: `Loaded "${list.name}" with ${listPoints.length} points.`,
-                    });
-                    // Auto-hide sidebar on mobile after loading
-                    if (window.innerWidth < 1024) {
-                      setListBuilderOpen(false);
-                    }
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-foreground truncate">
-                        {list.name}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {(list.isolationPointIds || []).length} isolation points
-                      </div>
-                      {list.jsaNumber && (
+            {!savedListsCollapsed && (
+              <div className="space-y-2 max-h-80 overflow-y-auto">
+                {savedLists.map((list) => (
+                  <div
+                    key={list.id}
+                    className="cursor-pointer hover:bg-muted/50 transition-colors border rounded-lg p-3"
+                    onClick={() => {
+                      const listPoints = allIsolationPoints.filter(point => 
+                        (list.isolationPointIds || []).includes(point.id)
+                      );
+                      setCurrentList(listPoints);
+                      toast({
+                        title: "List Loaded",
+                        description: `Loaded "${list.name}" with ${listPoints.length} points.`,
+                      });
+                      // Auto-hide sidebar on mobile after loading
+                      if (window.innerWidth < 1024) {
+                        setListBuilderOpen(false);
+                      }
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-foreground truncate">
+                          {list.name || 'Unnamed List'}
+                        </div>
                         <div className="text-xs text-muted-foreground">
-                          JSA: {list.jsaNumber}
+                          {(list.isolationPointIds || []).length} isolation points
                         </div>
-                      )}
-                      {list.workOrder && (
-                        <div className="text-xs text-muted-foreground">
-                          WO: {list.workOrder}
-                        </div>
-                      )}
-                      {list.jobDescription && (
-                        <div className="text-xs text-muted-foreground truncate">
-                          {list.jobDescription}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex space-x-1 ml-2">
-                      <div className={`w-3 h-3 rounded-full ${
-                        list.name.includes('Emergency') ? 'bg-caution-amber' :
-                        list.name.includes('Unit 1') ? 'bg-safety-green' :
-                        'bg-industrial-blue'
-                      }`}></div>
+                        {list.jsaNumber && (
+                          <div className="text-xs text-muted-foreground">
+                            JSA: {list.jsaNumber}
+                          </div>
+                        )}
+                        {list.workOrder && (
+                          <div className="text-xs text-muted-foreground">
+                            WO: {list.workOrder}
+                          </div>
+                        )}
+                        {list.jobDescription && (
+                          <div className="text-xs text-muted-foreground truncate">
+                            {list.jobDescription}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex space-x-1 ml-2">
+                        <div className={`w-3 h-3 rounded-full ${
+                          (list.name || '').includes('Emergency') ? 'bg-caution-amber' :
+                          (list.name || '').includes('Unit 1') ? 'bg-safety-green' :
+                          'bg-industrial-blue'
+                        }`}></div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
