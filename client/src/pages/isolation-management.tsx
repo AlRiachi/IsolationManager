@@ -276,8 +276,8 @@ export default function IsolationManagement() {
             />
           </div>
 
-          {/* List Builder - Desktop: side panel, Mobile: full screen overlay */}
-          <div className={`${listBuilderOpen ? 'block' : 'hidden'} lg:block ${listBuilderOpen ? 'fixed lg:relative inset-0 lg:inset-auto z-50 lg:z-auto bg-white lg:bg-transparent' : ''}`}>
+          {/* List Builder */}
+          <div className={`lg:w-96 lg:block ${listBuilderOpen ? 'fixed inset-0 z-50 bg-white lg:relative lg:inset-auto lg:z-auto lg:bg-transparent' : 'hidden'}`}>
             <ListBuilder
               currentList={currentList}
               savedLists={savedLists}
