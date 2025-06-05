@@ -27,7 +27,6 @@ const formSchema = insertIsolationPointSchema.extend({
   description: z.string().min(1, "Description is required"),
   type: z.string().min(1, "Type is required"),
   isolationMethod: z.string().min(1, "Isolation method is required"),
-  normalPosition: z.string().min(1, "Normal position is required"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -224,8 +223,8 @@ export default function IsolationPointsManagement() {
     const data = [];
     const errors = [];
     
-    // Expected headers
-    const expectedHeaders = ['kks', 'unit', 'description', 'type', 'isolationMethod', 'normalPosition', 'panelKks', 'loadKks', 'isolationPosition', 'specialInstructions'];
+    // Expected headers (simplified)
+    const expectedHeaders = ['kks', 'unit', 'description', 'type', 'isolationMethod'];
     
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
@@ -246,7 +245,7 @@ export default function IsolationPointsManagement() {
           description: row.description || '',
           type: row.type || '',
           isolationMethod: row.isolationMethod || '',
-          normalPosition: row.normalPosition || '',
+          normalPosition: row.normalPosition || 'Unknown',
           panelKks: row.panelKks || null,
           loadKks: row.loadKks || null,
           isolationPosition: row.isolationPosition || null,
@@ -259,7 +258,6 @@ export default function IsolationPointsManagement() {
         if (!validatedRow.description) throw new Error('Description is required');
         if (!validatedRow.type) throw new Error('Type is required');
         if (!validatedRow.isolationMethod) throw new Error('Isolation method is required');
-        if (!validatedRow.normalPosition) throw new Error('Normal position is required');
         
         data.push(validatedRow);
       } catch (error: any) {
@@ -309,9 +307,9 @@ export default function IsolationPointsManagement() {
   };
 
   const downloadTemplate = () => {
-    const headers = ['kks', 'unit', 'description', 'type', 'isolationMethod', 'normalPosition', 'panelKks', 'loadKks', 'isolationPosition', 'specialInstructions'];
+    const headers = ['kks', 'unit', 'description', 'type', 'isolationMethod'];
     const sampleData = [
-      '1AAA01AA001,Unit 1,Main Feed Water Pump Motor,Electrical,Open and LOTO,Closed,1ECA01AA001,1PAA01AA001,Open,Verify pump is stopped before isolation'
+      '1AAA01AA001,Unit 1,Main Feed Water Pump Motor,Electrical,Open and LOTO'
     ];
     
     const csvContent = [headers.join(','), ...sampleData].join('\n');
@@ -365,8 +363,8 @@ export default function IsolationPointsManagement() {
 
   const handleExportTemplate = () => {
     const csvTemplate = [
-      "KKS,Unit,Description,Type,Panel KKS,Load KKS,Isolation Method,Normal Position,Isolation Position,Special Instructions",
-      "1AAA01AA001,Unit 1,Sample Description,Electrical,1AAA01AB001,1AAA01AC001,Circuit Breaker,Closed,Open,Sample special instructions"
+      "kks,unit,description,type,isolationMethod",
+      "1AAA01AA001,Unit 1,Sample Description,Electrical,Open and LOTO"
     ].join('\n');
     
     const blob = new Blob([csvTemplate], { type: 'text/csv' });
@@ -381,7 +379,7 @@ export default function IsolationPointsManagement() {
     
     toast({
       title: "Template Downloaded",
-      description: "CSV template has been downloaded. Fill it out and upload to bulk import points.",
+      description: "CSV template has been downloaded with simplified format. Fill it out and upload to bulk import points.",
     });
   };
 
@@ -749,57 +747,6 @@ export default function IsolationPointsManagement() {
                           <SelectContent>
                             {methodOptions.map(method => (
                               <SelectItem key={method} value={method}>{method}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="normalPosition"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center space-x-1">
-                          <span>Normal Position</span>
-                          <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select position" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {positionOptions.map(position => (
-                              <SelectItem key={position} value={position}>{position}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="isolationPosition"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Isolation Position</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || ""}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select position" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {positionOptions.map(position => (
-                              <SelectItem key={position} value={position}>{position}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
