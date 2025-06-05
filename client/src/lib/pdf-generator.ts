@@ -84,10 +84,12 @@ export class EnterprisePDFGenerator {
 
   private addProcedureInfo(metadata: PDFMetadata): void {
     // Information table
+    const procedureDate = new Date().toLocaleDateString();
     const infoData = [
       ['JSA Number:', metadata.jsaNumber],
       ['Work Order:', metadata.workOrder],
       ['Job Description:', metadata.jobDescription],
+      ['Procedure Date:', procedureDate],
       ['Generated Date:', new Date(metadata.generatedDate).toLocaleDateString()],
       ['Total Isolation Points:', metadata.totalPoints.toString()],
       ['Document Status:', 'DRAFT - FOR REVIEW']
@@ -122,44 +124,36 @@ export class EnterprisePDFGenerator {
     this.doc.text('ISOLATION PROCEDURE STEPS', this.margin, this.currentY);
     this.currentY += 10;
 
-    // Table data preparation
+    // Table data preparation - simplified to essential columns
     const tableData = points.map((point, index) => [
       (index + 1).toString(),
       point.kks,
       point.unit,
       point.description,
-      point.type,
-      point.isolationMethod,
-      point.normalPosition,
-      '☐ Complete', // Checkbox for completion
-      '☐ Verified'  // Checkbox for verification
+      point.isolationMethod
     ]);
 
     autoTable(this.doc, {
       startY: this.currentY,
-      head: [['Step', 'KKS Code', 'Unit', 'Description', 'Type', 'Isolation Method', 'Normal Pos.', 'Complete', 'Verified']],
+      head: [['Step', 'KKS Code', 'Unit', 'Description', 'Isolation Method']],
       body: tableData,
       theme: 'striped',
       headStyles: {
         fillColor: [21, 101, 192],
         textColor: [255, 255, 255],
         fontStyle: 'bold',
-        fontSize: 9
+        fontSize: 10
       },
       bodyStyles: {
-        fontSize: 8,
-        cellPadding: 3
+        fontSize: 9,
+        cellPadding: 4
       },
       columnStyles: {
-        0: { cellWidth: 15, halign: 'center' },
-        1: { cellWidth: 25, fontStyle: 'bold' },
-        2: { cellWidth: 20 },
-        3: { cellWidth: 45 },
-        4: { cellWidth: 25 },
-        5: { cellWidth: 35 },
-        6: { cellWidth: 20 },
-        7: { cellWidth: 20, halign: 'center' },
-        8: { cellWidth: 20, halign: 'center' }
+        0: { cellWidth: 20, halign: 'center', fontStyle: 'bold' },
+        1: { cellWidth: 35, fontStyle: 'bold', textColor: [21, 101, 192] },
+        2: { cellWidth: 25 },
+        3: { cellWidth: 70 },
+        4: { cellWidth: 40 }
       },
       styles: {
         overflow: 'linebreak',
