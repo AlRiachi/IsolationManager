@@ -277,8 +277,8 @@ export default function ListBuilder({
         </div>
       </div>
       {/* Current List */}
-      <div className="flex-1 flex flex-col relative">
-        <div className="p-4 border-b border-border">
+      <div style={{ height: 'calc(100vh - 200px)' }} className="flex flex-col">
+        <div className="p-3 border-b border-border flex-shrink-0">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium text-foreground">Current List</h3>
             <span className="text-xs text-muted-foreground">
@@ -287,7 +287,7 @@ export default function ListBuilder({
           </div>
         </div>
         
-        <div className="absolute inset-x-0 top-20 bottom-32 overflow-y-auto px-2 py-1">
+        <div className="flex-1 overflow-y-scroll px-2 py-2" style={{ minHeight: 0 }}>
           {currentList.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-muted-foreground text-sm">
