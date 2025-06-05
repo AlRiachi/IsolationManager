@@ -191,10 +191,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         csvContent += "\n";
       }
 
-      // Generate CSV format for isolation points
-      const csvHeader = "KKS,Unit,Description,Type,Panel KKS,Load KKS,Method,Normal Position,Isolation Position,Special Instructions\n";
-      const csvData = selectedPoints.map(p => 
-        `"${p.kks}","${p.unit}","${p.description}","${p.type}","${p.panelKks || ''}","${p.loadKks || ''}","${p.isolationMethod}","${p.normalPosition}","${p.isolationPosition || ''}","${p.specialInstructions || ''}"`
+      // Generate CSV format for isolation points - simplified format
+      const csvHeader = "Step,KKS Code,Unit,Description,Isolation Method,Isolation Position\n";
+      const csvData = selectedPoints.map((p, index) => 
+        `${index + 1},"${p.kks}","${p.unit}","${p.description}","${p.isolationMethod}","${p.isolationPosition || 'N/A'}"`
       ).join('\n');
 
       csvContent += csvHeader + csvData;

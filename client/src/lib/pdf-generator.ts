@@ -24,17 +24,15 @@ export class EnterprisePDFGenerator {
   private currentY: number = 20;
 
   constructor() {
-    this.doc = new jsPDF('p', 'mm', 'a4');
+    this.doc = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape orientation
     this.pageWidth = this.doc.internal.pageSize.getWidth();
     this.pageHeight = this.doc.internal.pageSize.getHeight();
   }
 
   public generateLOTOProcedure(data: PDFExportData): void {
     this.addHeader(data.metadata);
-    this.addSafetyWarnings();
     this.addProcedureInfo(data.metadata);
     this.addIsolationTable(data.points);
-    this.addSignatureSection();
     this.addFooter();
   }
 
@@ -83,16 +81,11 @@ export class EnterprisePDFGenerator {
   }
 
   private addProcedureInfo(metadata: PDFMetadata): void {
-    // Information table
-    const procedureDate = new Date().toLocaleDateString();
+    // Information table - simplified to essential fields only
     const infoData = [
       ['JSA Number:', metadata.jsaNumber],
       ['Work Order:', metadata.workOrder],
-      ['Job Description:', metadata.jobDescription],
-      ['Procedure Date:', procedureDate],
-      ['Generated Date:', new Date(metadata.generatedDate).toLocaleDateString()],
-      ['Total Isolation Points:', metadata.totalPoints.toString()],
-      ['Document Status:', 'DRAFT - FOR REVIEW']
+      ['Job Description:', metadata.jobDescription]
     ];
 
     autoTable(this.doc, {
@@ -124,18 +117,19 @@ export class EnterprisePDFGenerator {
     this.doc.text('ISOLATION PROCEDURE STEPS', this.margin, this.currentY);
     this.currentY += 10;
 
-    // Table data preparation - simplified to essential columns
+    // Table data preparation - including isolation position
     const tableData = points.map((point, index) => [
       (index + 1).toString(),
       point.kks,
       point.unit,
       point.description,
-      point.isolationMethod
+      point.isolationMethod,
+      point.isolationPosition || 'N/A'
     ]);
 
     autoTable(this.doc, {
       startY: this.currentY,
-      head: [['Step', 'KKS Code', 'Unit', 'Description', 'Isolation Method']],
+      head: [['Step', 'KKS Code', 'Unit', 'Description', 'Isolation Method', 'Isolation Position']],
       body: tableData,
       theme: 'striped',
       headStyles: {
@@ -146,14 +140,15 @@ export class EnterprisePDFGenerator {
       },
       bodyStyles: {
         fontSize: 9,
-        cellPadding: 4
+        cellPadding: 3
       },
       columnStyles: {
         0: { cellWidth: 20, halign: 'center', fontStyle: 'bold' },
-        1: { cellWidth: 35, fontStyle: 'bold', textColor: [21, 101, 192] },
+        1: { cellWidth: 40, fontStyle: 'bold', textColor: [21, 101, 192] },
         2: { cellWidth: 25 },
-        3: { cellWidth: 70 },
-        4: { cellWidth: 40 }
+        3: { cellWidth: 90 },
+        4: { cellWidth: 60 },
+        5: { cellWidth: 40 }
       },
       styles: {
         overflow: 'linebreak',
