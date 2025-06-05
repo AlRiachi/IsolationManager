@@ -315,24 +315,24 @@ export default function ListBuilder({
                       <div className="flex items-center space-x-2 mb-1">
                         <GripVertical className="h-4 w-4 text-muted-foreground flex-shrink-0 touch-manipulation" />
                         <span className="text-xs sm:text-sm font-medium text-industrial-blue font-mono">
-                          {point.kks}
+                          {point.kks || ''}
                         </span>
-                        <Badge variant="outline" className={`${getTypeColor(point.type)} text-xs`}>
+                        <Badge variant="outline" className={`${getTypeColor(point.type || '')} text-xs`}>
                           <span className="w-1.5 h-1.5 bg-current rounded-full mr-1"></span>
-                          {point.type}
+                          {point.type || ''}
                         </Badge>
                       </div>
                       <div className="text-xs text-muted-foreground mb-2 pl-6">
-                        {point.description}
+                        {point.description || ''}
                       </div>
                       <div className="flex items-center space-x-4 text-xs text-muted-foreground pl-6">
-                        <span>Unit: {point.unit}</span>
+                        <span>Unit: {point.unit || ''}</span>
                         <div className="flex items-center space-x-2">
                           <span>Method:</span>
                           {editingMethodId === point.id ? (
                             <div className="flex items-center space-x-2">
                               <Select 
-                                value={point.isolationMethod} 
+                                value={point.isolationMethod || ''} 
                                 onValueChange={(value) => {
                                   onUpdateIsolationMethod(point.id, value);
                                   setEditingMethodId(null);

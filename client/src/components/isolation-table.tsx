@@ -199,10 +199,10 @@ export default function IsolationTable({
                   />
                 </td>
                 <td className="px-4 py-4 text-sm font-medium text-industrial-blue font-mono">
-                  {point.kks}
+                  {point.kks || ''}
                 </td>
                 <td className="px-4 py-4 text-sm text-foreground">
-                  {point.unit}
+                  {point.unit || ''}
                 </td>
                 <td className="px-4 py-4 text-sm text-foreground">
                   <div className="truncate" title={point.description || ''}>
@@ -210,13 +210,13 @@ export default function IsolationTable({
                   </div>
                 </td>
                 <td className="px-4 py-4">
-                  <Badge variant="outline" className={getTypeColor(point.type)}>
+                  <Badge variant="outline" className={getTypeColor(point.type || '')}>
                     <span className="w-2 h-2 rounded-full bg-current mr-1.5"></span>
-                    {point.type}
+                    {point.type || ''}
                   </Badge>
                 </td>
                 <td className="px-4 py-4 text-sm text-foreground">
-                  {point.isolationMethod}
+                  {point.isolationMethod || ''}
                 </td>
                 <td className="px-4 py-4 text-sm" onClick={(e) => e.stopPropagation()}>
                   <div className="flex space-x-1">
