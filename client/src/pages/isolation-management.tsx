@@ -276,17 +276,19 @@ export default function IsolationManagement() {
             />
           </div>
 
-          {/* List Builder */}
-          <div className={`lg:w-96 lg:block ${listBuilderOpen ? 'fixed inset-0 z-50 bg-white lg:relative lg:inset-auto lg:z-auto lg:bg-transparent' : 'hidden'}`}>
-            <ListBuilder
-              currentList={currentList}
-              savedLists={savedLists}
-              onRemoveFromList={handleRemoveFromList}
-              onReorderList={handleReorderList}
-              onUpdateIsolationMethod={handleUpdateIsolationMethod}
-              onClose={() => setListBuilderOpen(false)}
-              onExport={handleExportLists}
-            />
+          {/* List Builder - Always visible on desktop, toggle on mobile */}
+          <div className="lg:w-96 lg:block">
+            <div className={`${listBuilderOpen ? 'block' : 'hidden lg:block'} ${listBuilderOpen ? 'fixed inset-0 z-50 bg-white lg:relative lg:inset-auto lg:z-auto lg:bg-transparent' : ''}`}>
+              <ListBuilder
+                currentList={currentList}
+                savedLists={savedLists}
+                onRemoveFromList={handleRemoveFromList}
+                onReorderList={handleReorderList}
+                onUpdateIsolationMethod={handleUpdateIsolationMethod}
+                onClose={() => setListBuilderOpen(false)}
+                onExport={handleExportLists}
+              />
+            </div>
           </div>
         </main>
       </div>
