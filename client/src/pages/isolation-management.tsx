@@ -270,8 +270,8 @@ export default function IsolationManagement() {
             />
           </div>
 
-          {/* List Builder */}
-          {listBuilderOpen && (
+          {/* List Builder - Desktop: side panel, Mobile: full screen overlay */}
+          <div className={`${listBuilderOpen ? 'block' : 'hidden'} lg:block ${listBuilderOpen ? 'fixed lg:relative inset-0 lg:inset-auto z-50 lg:z-auto bg-white lg:bg-transparent' : ''}`}>
             <ListBuilder
               currentList={currentList}
               savedLists={savedLists}
@@ -281,7 +281,7 @@ export default function IsolationManagement() {
               onClose={() => setListBuilderOpen(false)}
               onExport={handleExportLists}
             />
-          )}
+          </div>
         </main>
       </div>
 
