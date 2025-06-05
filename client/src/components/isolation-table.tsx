@@ -172,24 +172,12 @@ export default function IsolationTable({
                 </button>
               </th>
               <th className="w-32 px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Panel KKS
-              </th>
-              <th className="w-32 px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('isolationMethod')}
                   className="flex items-center space-x-1 hover:text-foreground"
                 >
-                  <span>Method</span>
+                  <span>Isolation Method</span>
                   <SortIcon field="isolationMethod" />
-                </button>
-              </th>
-              <th className="w-24 px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                <button
-                  onClick={() => handleSort('normalPosition')}
-                  className="flex items-center space-x-1 hover:text-foreground"
-                >
-                  <span>Position</span>
-                  <SortIcon field="normalPosition" />
                 </button>
               </th>
               <th className="w-20 px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -227,16 +215,8 @@ export default function IsolationTable({
                     {point.type}
                   </Badge>
                 </td>
-                <td className="px-4 py-4 text-sm text-muted-foreground font-mono">
-                  {point.panelKks || '-'}
-                </td>
                 <td className="px-4 py-4 text-sm text-foreground">
                   {point.isolationMethod}
-                </td>
-                <td className="px-4 py-4">
-                  <Badge variant="outline" className={getPositionColor(point.normalPosition)}>
-                    {point.normalPosition}
-                  </Badge>
                 </td>
                 <td className="px-4 py-4 text-sm" onClick={(e) => e.stopPropagation()}>
                   <div className="flex space-x-1">

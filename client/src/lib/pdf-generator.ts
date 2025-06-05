@@ -117,19 +117,19 @@ export class EnterprisePDFGenerator {
     this.doc.text('ISOLATION PROCEDURE STEPS', this.margin, this.currentY);
     this.currentY += 10;
 
-    // Table data preparation - including isolation position
+    // Table data preparation - simplified format
     const tableData = points.map((point, index) => [
       (index + 1).toString(),
       point.kks,
       point.unit,
       point.description,
-      point.isolationMethod,
-      point.isolationPosition || 'N/A'
+      point.type,
+      point.isolationMethod
     ]);
 
     autoTable(this.doc, {
       startY: this.currentY,
-      head: [['Step', 'KKS Code', 'Unit', 'Description', 'Isolation Method', 'Isolation Position']],
+      head: [['Step', 'KKS Code', 'Unit', 'Description', 'Type', 'Isolation Method']],
       body: tableData,
       theme: 'striped',
       headStyles: {
@@ -146,9 +146,9 @@ export class EnterprisePDFGenerator {
         0: { cellWidth: 15, halign: 'center', fontStyle: 'bold' },
         1: { cellWidth: 35, fontStyle: 'bold', textColor: [21, 101, 192] },
         2: { cellWidth: 20 },
-        3: { cellWidth: 80 },
-        4: { cellWidth: 50 },
-        5: { cellWidth: 35 }
+        3: { cellWidth: 70 },
+        4: { cellWidth: 25 },
+        5: { cellWidth: 50 }
       },
       styles: {
         overflow: 'linebreak',

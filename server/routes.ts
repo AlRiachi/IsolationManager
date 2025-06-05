@@ -199,9 +199,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate CSV format for isolation points - simplified format
-      const csvHeader = "Step,KKS Code,Unit,Description,Isolation Method,Isolation Position\n";
+      const csvHeader = "Step,KKS Code,Unit,Description,Type,Isolation Method\n";
       const csvData = selectedPoints.map((p, index) => 
-        `${index + 1},"${p.kks}","${p.unit}","${p.description}","${p.isolationMethod}","${p.isolationPosition || 'N/A'}"`
+        `${index + 1},"${p.kks}","${p.unit}","${p.description}","${p.type}","${p.isolationMethod}"`
       ).join('\n');
 
       csvContent += csvHeader + csvData;
